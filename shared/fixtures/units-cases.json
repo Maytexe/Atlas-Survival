@@ -1,0 +1,82 @@
+[
+  {
+    "name": "quilograma para gramas",
+    "unit": "kg",
+    "quantity": "1.250",
+    "expected": {
+      "dimension": "MASS",
+      "base_unit": "g",
+      "base_quantity": "1250.000"
+    }
+  },
+  {
+    "name": "gramas permanecem em gramas",
+    "unit": "g",
+    "quantity": "125.500",
+    "expected": {
+      "dimension": "MASS",
+      "base_unit": "g",
+      "base_quantity": "125.500"
+    }
+  },
+  {
+    "name": "litros para mililitros",
+    "unit": "L",
+    "quantity": "2.500",
+    "expected": {
+      "dimension": "VOLUME",
+      "base_unit": "ml",
+      "base_quantity": "2500.000"
+    }
+  },
+  {
+    "name": "mililitros permanecem em mililitros",
+    "unit": "ml",
+    "quantity": "750.125",
+    "expected": {
+      "dimension": "VOLUME",
+      "base_unit": "ml",
+      "base_quantity": "750.125"
+    }
+  },
+  {
+    "name": "unidade conta como ela mesma",
+    "unit": "unidade",
+    "quantity": "3.000",
+    "expected": {
+      "dimension": "COUNT",
+      "base_unit": "unidade",
+      "base_quantity": "3.000"
+    }
+  },
+  {
+    "name": "pacote conta como ele mesmo",
+    "unit": "pacote",
+    "quantity": "2.000",
+    "expected": {
+      "dimension": "COUNT",
+      "base_unit": "pacote",
+      "base_quantity": "2.000"
+    }
+  },
+  {
+    "name": "lata conta como ela mesma",
+    "unit": "lata",
+    "quantity": "4.000",
+    "expected": {
+      "dimension": "COUNT",
+      "base_unit": "lata",
+      "base_quantity": "4.000"
+    }
+  },
+  {
+    "name": "garrafa conta como ela mesma",
+    "unit": "garrafa",
+    "quantity": "1.000",
+    "expected": {
+      "dimension": "COUNT",
+      "base_unit": "garrafa",
+      "base_quantity": "1.000"
+    }
+  }
+]

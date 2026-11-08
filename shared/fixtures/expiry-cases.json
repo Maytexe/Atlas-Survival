@@ -1,0 +1,52 @@
+[
+  {
+    "name": "vence hoje continua valido",
+    "today": "2026-01-15",
+    "expiration_date": "2026-01-15",
+    "expected": {
+      "expired": false,
+      "days_until_expiration": 0,
+      "expiring_soon": true
+    }
+  },
+  {
+    "name": "venceu ontem",
+    "today": "2026-01-15",
+    "expiration_date": "2026-01-14",
+    "expected": {
+      "expired": true,
+      "days_until_expiration": -1,
+      "expiring_soon": false
+    }
+  },
+  {
+    "name": "vence em trinta dias",
+    "today": "2026-01-15",
+    "expiration_date": "2026-02-14",
+    "expected": {
+      "expired": false,
+      "days_until_expiration": 30,
+      "expiring_soon": true
+    }
+  },
+  {
+    "name": "vence em trinta e um dias",
+    "today": "2026-01-15",
+    "expiration_date": "2026-02-15",
+    "expected": {
+      "expired": false,
+      "days_until_expiration": 31,
+      "expiring_soon": false
+    }
+  },
+  {
+    "name": "sem validade",
+    "today": "2026-01-15",
+    "expiration_date": null,
+    "expected": {
+      "expired": false,
+      "days_until_expiration": null,
+      "expiring_soon": false
+    }
+  }
+]

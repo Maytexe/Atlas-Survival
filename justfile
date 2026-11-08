@@ -28,6 +28,9 @@ db-up:
 migrate:
     uv run --directory backend alembic upgrade head
 
+openapi:
+    uv run --directory backend python scripts/export_openapi.py
+
 backend-check:
     uv run --directory backend ruff check .
     uv run --directory backend mypy .

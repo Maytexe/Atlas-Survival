@@ -6,26 +6,27 @@ from pathlib import Path
 
 import asyncpg  # type: ignore[import-untyped]
 import pytest
-from sqlalchemy.engine import make_url
 
-TEST_DATABASE_NAME = "atlas_test"
+from app.db.test_support import require_test_database_url
+
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
 
 
 def _test_database_url() -> str:
-    source_url = make_url(
-        os.environ.get(
-            "DATABASE_URL",
-            "postgresql+asyncpg://atlas:atlas-local-only@127.0.0.1:5432/atlas",
-        )
+    source_url = os.environ.get(
+        "DATABASE_URL",
+        "postgresql+asyncpg://atlas:atlas-local-only@127.0.0.1:5432/atlas_test",
     )
-    return source_url.set(database=TEST_DATABASE_NAME).render_as_string(hide_password=False)
+    return require_test_database_url(source_url)
 
 
 async def _ensure_test_database(database_url: str) -> None:
-    url = make_url(database_url)
-    if url.database != TEST_DATABASE_NAME:
-        raise RuntimeError("Os testes só podem usar o banco atlas_test.")
+    from sqlalchemy.engine import make_url
+
+    url = make_url(require_test_database_url(database_url))
+    database_name = url.database
+    if database_name is None:
+        raise RuntimeError("DATABASE_URL precisa informar o nome do banco de teste.")
 
     connection = await asyncpg.connect(
         host=url.host,
@@ -37,10 +38,11 @@ async def _ensure_test_database(database_url: str) -> None:
     try:
         database_exists = await connection.fetchval(
             "SELECT 1 FROM pg_database WHERE datname = $1",
-            TEST_DATABASE_NAME,
+            database_name,
         )
         if not database_exists:
-            await connection.execute('CREATE DATABASE "atlas_test"')
+            safe_database_name = database_name.replace('"', '""')
+            await connection.execute(f'CREATE DATABASE "{safe_database_name}"')
     finally:
         await connection.close()
 
@@ -73,6 +75,4 @@ def test_database_url() -> Iterator[str]:
 
 @pytest.fixture
 def ensure_test_database_name(test_database_url: str) -> str:
-    if make_url(test_database_url).database != TEST_DATABASE_NAME:
-        raise RuntimeError("Os testes só podem usar o banco atlas_test.")
-    return test_database_url
+    return require_test_database_url(test_database_url)

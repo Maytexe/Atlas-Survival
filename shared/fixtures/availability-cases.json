@@ -1,0 +1,81 @@
+[
+  {
+    "name": "sem lotes",
+    "today": "2026-01-15",
+    "batches": [],
+    "expected": {
+      "available": "0.000",
+      "expired_quantity": "0.000"
+    }
+  },
+  {
+    "name": "lote sem validade esta disponivel",
+    "today": "2026-01-15",
+    "batches": [
+      {
+        "id": "lote-1",
+        "quantity": "2.500",
+        "expiration_date": null
+      }
+    ],
+    "expected": {
+      "available": "2.500",
+      "expired_quantity": "0.000"
+    }
+  },
+  {
+    "name": "vence hoje ainda esta disponivel",
+    "today": "2026-01-15",
+    "batches": [
+      {
+        "id": "lote-1",
+        "quantity": "3.000",
+        "expiration_date": "2026-01-15"
+      }
+    ],
+    "expected": {
+      "available": "3.000",
+      "expired_quantity": "0.000"
+    }
+  },
+  {
+    "name": "lote vencido nao conta como disponivel",
+    "today": "2026-01-15",
+    "batches": [
+      {
+        "id": "lote-vencido",
+        "quantity": "4.000",
+        "expiration_date": "2026-01-14"
+      },
+      {
+        "id": "lote-valido",
+        "quantity": "1.250",
+        "expiration_date": null
+      }
+    ],
+    "expected": {
+      "available": "1.250",
+      "expired_quantity": "4.000"
+    }
+  },
+  {
+    "name": "todos os lotes estao vencidos",
+    "today": "2026-01-15",
+    "batches": [
+      {
+        "id": "lote-1",
+        "quantity": "2.000",
+        "expiration_date": "2026-01-10"
+      },
+      {
+        "id": "lote-2",
+        "quantity": "1.500",
+        "expiration_date": "2026-01-14"
+      }
+    ],
+    "expected": {
+      "available": "0.000",
+      "expired_quantity": "3.500"
+    }
+  }
+]

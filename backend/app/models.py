@@ -10,6 +10,7 @@ from sqlalchemy import (
     Date,
     DateTime,
     Enum,
+    FetchedValue,
     ForeignKey,
     Index,
     MetaData,
@@ -99,12 +100,20 @@ class HouseholdMember(Base):
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, server_default=func.now()
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        server_onupdate=FetchedValue(),
     )
     client_updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
-    change_seq: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    change_seq: Mapped[int] = mapped_column(
+        BigInteger,
+        nullable=False,
+        server_default=FetchedValue(),
+        server_onupdate=FetchedValue(),
+    )
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
@@ -127,12 +136,20 @@ class Category(Base):
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, server_default=func.now()
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        server_onupdate=FetchedValue(),
     )
     client_updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
-    change_seq: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    change_seq: Mapped[int] = mapped_column(
+        BigInteger,
+        nullable=False,
+        server_default=FetchedValue(),
+        server_onupdate=FetchedValue(),
+    )
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
@@ -167,12 +184,20 @@ class InventoryItem(Base):
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, server_default=func.now()
+        DateTime(timezone=True),
+        nullable=False,
+        server_onupdate=FetchedValue(),
+        server_default=func.now(),
     )
     client_updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
-    change_seq: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    change_seq: Mapped[int] = mapped_column(
+        BigInteger,
+        nullable=False,
+        server_default=FetchedValue(),
+        server_onupdate=FetchedValue(),
+    )
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
@@ -203,12 +228,20 @@ class StockBatch(Base):
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, server_default=func.now()
+        DateTime(timezone=True),
+        nullable=False,
+        server_onupdate=FetchedValue(),
+        server_default=func.now(),
     )
     client_updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
-    change_seq: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    change_seq: Mapped[int] = mapped_column(
+        BigInteger,
+        nullable=False,
+        server_default=FetchedValue(),
+        server_onupdate=FetchedValue(),
+    )
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 

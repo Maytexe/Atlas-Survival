@@ -1,0 +1,281 @@
+[
+  {
+    "name": "arredonda para baixo",
+    "today": "2026-01-15",
+    "items": [
+      {
+        "id": "arredondamento",
+        "name": "Item de teste",
+        "item_kind": "FOOD",
+        "unit": "kg",
+        "daily_consumption": "3.000",
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": [
+          {
+            "id": "lote-1",
+            "quantity": "10.000",
+            "expiration_date": null
+          }
+        ]
+      },
+      {
+        "id": "sem-consumo-na-cobertura",
+        "name": "Sem consumo",
+        "item_kind": "FOOD",
+        "unit": "kg",
+        "daily_consumption": null,
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": []
+      }
+    ],
+    "expected": {
+      "item_days": {
+        "arredondamento": 3,
+        "sem-consumo-na-cobertura": null
+      },
+      "aggregates": [
+        {
+          "item_kind": "FOOD",
+          "dimension": "MASS",
+          "days": 3,
+          "coverage_count": 1,
+          "total_items": 2,
+          "coverage_label": "calculado com 1 de 2 itens",
+          "limiting_item": "arredondamento"
+        }
+      ]
+    }
+  },
+  {
+    "name": "per person sem pessoas fica sem autonomia",
+    "today": "2026-01-15",
+    "items": [
+      {
+        "id": "sem-pessoas",
+        "name": "Item por pessoa",
+        "item_kind": "FOOD",
+        "unit": "kg",
+        "daily_consumption": "1.000",
+        "consumption_basis": "PER_PERSON",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": [
+          {
+            "id": "lote-1",
+            "quantity": "5.000",
+            "expiration_date": null
+          }
+        ]
+      }
+    ],
+    "expected": {
+      "item_days": {
+        "sem-pessoas": null
+      },
+      "aggregates": []
+    }
+  },
+  {
+    "name": "per animal sem animais fica sem autonomia",
+    "today": "2026-01-15",
+    "items": [
+      {
+        "id": "sem-animais",
+        "name": "Item por animal",
+        "item_kind": "FOOD",
+        "unit": "kg",
+        "daily_consumption": "1.000",
+        "consumption_basis": "PER_ANIMAL",
+        "person_count": 3,
+        "animal_count": 0,
+        "batches": [
+          {
+            "id": "lote-1",
+            "quantity": "5.000",
+            "expiration_date": null
+          }
+        ]
+      }
+    ],
+    "expected": {
+      "item_days": {
+        "sem-animais": null
+      },
+      "aggregates": []
+    }
+  },
+  {
+    "name": "consumo ausente e zero nao geram autonomia",
+    "today": "2026-01-15",
+    "items": [
+      {
+        "id": "sem-consumo",
+        "name": "Sem consumo",
+        "item_kind": "FOOD",
+        "unit": "kg",
+        "daily_consumption": null,
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": [
+          {
+            "id": "lote-1",
+            "quantity": "5.000",
+            "expiration_date": null
+          }
+        ]
+      },
+      {
+        "id": "consumo-zero",
+        "name": "Consumo zero",
+        "item_kind": "WATER",
+        "unit": "L",
+        "daily_consumption": "0.000",
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": [
+          {
+            "id": "lote-2",
+            "quantity": "10.000",
+            "expiration_date": null
+          }
+        ]
+      }
+    ],
+    "expected": {
+      "item_days": {
+        "sem-consumo": null,
+        "consumo-zero": null
+      },
+      "aggregates": []
+    }
+  },
+  {
+    "name": "kg e g agregam na base gramas",
+    "today": "2026-01-15",
+    "items": [
+      {
+        "id": "farinha",
+        "name": "Farinha",
+        "item_kind": "FOOD",
+        "unit": "kg",
+        "daily_consumption": "1.000",
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": [
+          {
+            "id": "lote-f",
+            "quantity": "2.000",
+            "expiration_date": null
+          }
+        ]
+      },
+      {
+        "id": "aveia",
+        "name": "Aveia",
+        "item_kind": "FOOD",
+        "unit": "g",
+        "daily_consumption": "500.000",
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": [
+          {
+            "id": "lote-a",
+            "quantity": "500.000",
+            "expiration_date": null
+          }
+        ]
+      }
+    ],
+    "expected": {
+      "item_days": {
+        "farinha": 2,
+        "aveia": 1
+      },
+      "aggregates": [
+        {
+          "item_kind": "FOOD",
+          "dimension": "MASS",
+          "days": 1,
+          "coverage_count": 2,
+          "total_items": 2,
+          "coverage_label": "calculado com 2 de 2 itens",
+          "limiting_item": "aveia"
+        }
+      ]
+    }
+  },
+  {
+    "name": "litros e mililitros agregam na base mililitros",
+    "today": "2026-01-15",
+    "items": [
+      {
+        "id": "agua",
+        "name": "Agua",
+        "item_kind": "WATER",
+        "unit": "L",
+        "daily_consumption": "2.000",
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": [
+          {
+            "id": "lote-agua",
+            "quantity": "4.000",
+            "expiration_date": null
+          }
+        ]
+      },
+      {
+        "id": "suco",
+        "name": "Suco",
+        "item_kind": "WATER",
+        "unit": "ml",
+        "daily_consumption": "500.000",
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": [
+          {
+            "id": "lote-suco",
+            "quantity": "500.000",
+            "expiration_date": null
+          }
+        ]
+      }
+    ],
+    "expected": {
+      "item_days": {
+        "agua": 2,
+        "suco": 1
+      },
+      "aggregates": [
+        {
+          "item_kind": "WATER",
+          "dimension": "VOLUME",
+          "days": 1,
+          "coverage_count": 2,
+          "total_items": 2,
+          "coverage_label": "calculado com 2 de 2 itens",
+          "limiting_item": "suco"
+        }
+      ]
+    }
+  },
+  {
+    "name": "sem dados de autonomia",
+    "today": "2026-01-15",
+    "items": [],
+    "expected": {
+      "item_days": {},
+      "aggregates": []
+    }
+  }
+]

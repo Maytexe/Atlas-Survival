@@ -6,10 +6,11 @@ from decimal import Decimal
 import pytest
 from sqlalchemy import delete, insert, text, update
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.asyncio import AsyncConnection, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncConnection, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 from sqlalchemy.sql import Executable
 
+from app.db.session import write_transaction
 from app.models import (
     Category,
     ConsumptionBasis,
@@ -231,3 +232,54 @@ def test_trigger_assigns_global_change_seq_on_insert_and_update(
         assert inserted_updated_at < updated_updated_at
 
     _run_isolated(ensure_test_database_name, operation)
+
+
+def test_write_helper_serializes_sequence_with_commit_order(
+    ensure_test_database_name: str,
+) -> None:
+    async def run() -> None:
+        engine = create_async_engine(ensure_test_database_name, poolclass=NullPool)
+        factory = async_sessionmaker(engine, expire_on_commit=False)
+        first_has_lock = asyncio.Event()
+        second_started = asyncio.Event()
+        release_first = asyncio.Event()
+
+        async def first_write() -> int:
+            async with write_transaction(factory) as session:
+                category = Category(
+                    id=uuid.uuid4(),
+                    name=f"Categoria concorrente A {uuid.uuid4()}",
+                )
+                session.add(category)
+                await session.flush()
+                first_seq = category.change_seq
+                first_has_lock.set()
+                await release_first.wait()
+                return first_seq
+
+        async def second_write() -> int:
+            await first_has_lock.wait()
+            second_started.set()
+            async with write_transaction(factory) as session:
+                category = Category(
+                    id=uuid.uuid4(),
+                    name=f"Categoria concorrente B {uuid.uuid4()}",
+                )
+                session.add(category)
+                await session.flush()
+                return category.change_seq
+
+        first_task = asyncio.create_task(first_write())
+        second_task = asyncio.create_task(second_write())
+        try:
+            await asyncio.wait_for(second_started.wait(), timeout=5)
+            await asyncio.sleep(0.1)
+            assert not second_task.done()
+        finally:
+            release_first.set()
+        first_seq, second_seq = await asyncio.gather(first_task, second_task)
+        await engine.dispose()
+
+        assert second_seq > first_seq
+
+    asyncio.run(run())

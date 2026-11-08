@@ -37,6 +37,10 @@ Os testes de banco criam e usam exclusivamente `atlas_test`; a fixture aplica e
 reverte as migrações nesse banco. Eles não acessam o banco `atlas` de desenvolvimento.
 Para inserir dados de demonstração fictícios, execute
 `uv run --directory backend python scripts/seed_dev.py` com `ENVIRONMENT=development`.
+`just openapi` atualiza `shared/openapi.json`; o gate do backend verifica se o artefato
+está sincronizado com a API. Todas as escritas REST e sync compartilham um advisory lock
+transacional para manter `change_seq` em ordem de commit (decisão em
+[docs/decisions/003-ordem-change-seq.md](docs/decisions/003-ordem-change-seq.md)).
 
 A API escuta em `127.0.0.1:8000`; `GET /api/health` retorna o status da API.
 O Vite escuta em `127.0.0.1:5173`. Configure `CORS_ORIGINS` no `.env` para

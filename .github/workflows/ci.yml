@@ -11,7 +11,7 @@ jobs:
       postgres:
         image: postgres:17-alpine
         env:
-          POSTGRES_DB: atlas
+          POSTGRES_DB: atlas_test
           POSTGRES_USER: atlas
           POSTGRES_PASSWORD: atlas-ci
         ports:
@@ -22,7 +22,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     env:
-      DATABASE_URL: postgresql+asyncpg://atlas:atlas-ci@localhost:5432/atlas
+      DATABASE_URL: postgresql+asyncpg://atlas:atlas-ci@localhost:5432/atlas_test
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6

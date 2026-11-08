@@ -3,6 +3,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api import register_routes
 from app.core.config import settings
 
 logging.basicConfig(level=logging.INFO)
@@ -15,8 +16,4 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.get("/api/health")
-async def health() -> dict[str, str]:
-    return {"status": "ok"}
+register_routes(app)

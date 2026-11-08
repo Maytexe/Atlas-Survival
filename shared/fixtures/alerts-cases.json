@@ -1,0 +1,189 @@
+[
+  {
+    "name": "alertas abrangem validade estoque e consumo",
+    "today": "2026-01-15",
+    "low_stock_days": 7,
+    "members": [],
+    "items": [
+      {
+        "id": "comida",
+        "name": "Comida de teste",
+        "item_kind": "FOOD",
+        "unit": "kg",
+        "daily_consumption": "1.000",
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": [
+          {
+            "id": "vencido",
+            "quantity": "1.000",
+            "expiration_date": "2026-01-14"
+          },
+          {
+            "id": "vence-hoje",
+            "quantity": "1.000",
+            "expiration_date": "2026-01-15"
+          },
+          {
+            "id": "vence-em-30",
+            "quantity": "1.000",
+            "expiration_date": "2026-02-14"
+          }
+        ]
+      },
+      {
+        "id": "agua",
+        "name": "Agua de teste",
+        "item_kind": "WATER",
+        "unit": "L",
+        "daily_consumption": "1.000",
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": []
+      },
+      {
+        "id": "sem-consumo",
+        "name": "Item sem consumo",
+        "item_kind": "OTHER",
+        "unit": "pacote",
+        "daily_consumption": null,
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": [
+          {
+            "id": "validade-a-31",
+            "quantity": "1.000",
+            "expiration_date": "2026-02-15"
+          }
+        ]
+      }
+    ],
+    "expected": [
+      {
+        "type": "EXPIRED",
+        "severity": "CRITICAL",
+        "item_id": "comida",
+        "batch_id": "vencido",
+        "date": "2026-01-14"
+      },
+      {
+        "type": "OUT_OF_STOCK",
+        "severity": "CRITICAL",
+        "item_id": "agua",
+        "batch_id": null,
+        "date": null
+      },
+      {
+        "type": "EXPIRING_SOON",
+        "severity": "WARNING",
+        "item_id": "comida",
+        "batch_id": "vence-hoje",
+        "date": "2026-01-15"
+      },
+      {
+        "type": "EXPIRING_SOON",
+        "severity": "WARNING",
+        "item_id": "comida",
+        "batch_id": "vence-em-30",
+        "date": "2026-02-14"
+      },
+      {
+        "type": "LOW_STOCK",
+        "severity": "WARNING",
+        "item_id": "agua",
+        "batch_id": null,
+        "date": null
+      },
+      {
+        "type": "LOW_STOCK",
+        "severity": "WARNING",
+        "item_id": "comida",
+        "batch_id": null,
+        "date": null
+      },
+      {
+        "type": "NO_CONSUMPTION_DATA",
+        "severity": "INFO",
+        "item_id": "sem-consumo",
+        "batch_id": null,
+        "date": null
+      }
+    ]
+  },
+  {
+    "name": "tudo vencido e consumo zero nao geram LOW_STOCK",
+    "today": "2026-01-15",
+    "low_stock_days": 7,
+    "members": [],
+    "items": [
+      {
+        "id": "tudo-vencido",
+        "name": "Tudo vencido",
+        "item_kind": "FOOD",
+        "unit": "kg",
+        "daily_consumption": "1.000",
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": [
+          {
+            "id": "lote-vencido",
+            "quantity": "2.000",
+            "expiration_date": "2026-01-14"
+          }
+        ]
+      },
+      {
+        "id": "consumo-zero",
+        "name": "Consumo zero",
+        "item_kind": "FOOD",
+        "unit": "kg",
+        "daily_consumption": "0.000",
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": []
+      }
+    ],
+    "expected": [
+      {
+        "type": "EXPIRED",
+        "severity": "CRITICAL",
+        "item_id": "tudo-vencido",
+        "batch_id": "lote-vencido",
+        "date": "2026-01-14"
+      },
+      {
+        "type": "OUT_OF_STOCK",
+        "severity": "CRITICAL",
+        "item_id": "consumo-zero",
+        "batch_id": null,
+        "date": null
+      },
+      {
+        "type": "OUT_OF_STOCK",
+        "severity": "CRITICAL",
+        "item_id": "tudo-vencido",
+        "batch_id": null,
+        "date": null
+      },
+      {
+        "type": "LOW_STOCK",
+        "severity": "WARNING",
+        "item_id": "tudo-vencido",
+        "batch_id": null,
+        "date": null
+      },
+      {
+        "type": "NO_CONSUMPTION_DATA",
+        "severity": "INFO",
+        "item_id": "consumo-zero",
+        "batch_id": null,
+        "date": null
+      }
+    ]
+  }
+]
