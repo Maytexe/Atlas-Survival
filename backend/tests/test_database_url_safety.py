@@ -1,6 +1,5 @@
 import pytest
-
-from app.db.test_support import require_test_database_url
+from database_support import require_test_database_url
 
 
 def test_test_database_url_rejects_development_database(monkeypatch: pytest.MonkeyPatch) -> None:

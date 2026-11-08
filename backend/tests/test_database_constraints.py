@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncConnection, async_sessionmaker, create_a
 from sqlalchemy.pool import NullPool
 from sqlalchemy.sql import Executable
 
-from app.db.session import write_transaction
+from app.db.writes import write_transaction
 from app.models import (
     Category,
     ConsumptionBasis,

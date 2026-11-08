@@ -1,6 +1,9 @@
 ---
 applyTo: "frontend/src/**/*.{ts,tsx}"
 ---
+- Estrutura obrigatória: `src/{pages,components,hooks,services,domain,db,store,types,i18n,pwa}`.
+- Um componente por arquivo; mantenha cada arquivo com aproximadamente 250 linhas ou menos.
+- `src/domain/` contém apenas funções puras e não pode importar React.
 - Fluxo: pages → hooks → services (repositories/sync) → Dexie/Axios. Componente nunca chama
   Axios nem Dexie direto.
 - Leitura via `useLiveQuery`. Escrita via repository: entidade + outbox na MESMA transação Dexie.

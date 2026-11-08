@@ -3,8 +3,9 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import register_routes
+from app.api.router import router
 from app.core.config import settings
+from app.core.errors import install_problem_handlers
 
 logging.basicConfig(level=logging.INFO)
 
@@ -16,4 +17,5 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-register_routes(app)
+install_problem_handlers(app)
+app.include_router(router)

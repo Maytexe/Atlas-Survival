@@ -11,8 +11,9 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
-from app.core.dependencies import get_today
-from app.db.session import get_session, get_session_factory, get_write_session, write_transaction
+from app.core.clock import get_today
+from app.db.session import get_session, get_session_factory
+from app.db.writes import get_write_session, write_transaction
 from app.main import app
 
 

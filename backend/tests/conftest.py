@@ -6,8 +6,7 @@ from pathlib import Path
 
 import asyncpg  # type: ignore[import-untyped]
 import pytest
-
-from app.db.test_support import require_test_database_url
+from database_support import require_test_database_url
 
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
 

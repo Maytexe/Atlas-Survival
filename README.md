@@ -33,6 +33,10 @@ são exclusivas para desenvolvimento local.
 
 O frontend usa CSS Modules para estilos isolados.
 
+O backend é organizado por responsabilidade em `backend/app/core`, `db`, `models`,
+`schemas`, `domain`, `services` e `api/routes`. A exportação OpenAPI fica em
+`backend/scripts/export_openapi.py`.
+
 Os testes de banco criam e usam exclusivamente `atlas_test`; a fixture aplica e
 reverte as migrações nesse banco. Eles não acessam o banco `atlas` de desenvolvimento.
 Para inserir dados de demonstração fictícios, execute
