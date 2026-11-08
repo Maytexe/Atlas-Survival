@@ -1,0 +1,1 @@
+export { updateServiceWorker } from './register'

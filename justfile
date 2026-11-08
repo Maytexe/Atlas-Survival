@@ -31,6 +31,9 @@ migrate:
 openapi:
     uv run --directory backend python scripts/export_openapi.py
 
+types:
+    npm --prefix frontend run types
+
 backend-check:
     uv run --directory backend ruff check .
     uv run --directory backend mypy .
@@ -40,6 +43,7 @@ frontend-check:
     npm --prefix frontend run lint
     npm --prefix frontend run format:check
     npm --prefix frontend run typecheck
+    npm --prefix frontend run types:check
     npm --prefix frontend run test
     npm --prefix frontend run build
 
