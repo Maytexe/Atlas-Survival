@@ -1,0 +1,35 @@
+.card {
+  width: min(100%, 42rem);
+  padding: clamp(2rem, 8vw, 4rem);
+  border: 1px solid #d9dccf;
+  border-radius: 1rem;
+  background: #fffef9;
+  box-shadow: 0 1rem 3rem rgb(36 40 32 / 8%);
+}
+
+.eyebrow {
+  color: var(--color-accent);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.heading {
+  max-width: 16ch;
+  margin: 1rem 0;
+  font-size: clamp(2rem, 7vw, 3.5rem);
+  line-height: 1.05;
+}
+
+.supportingText {
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+@media (prefers-color-scheme: dark) {
+  .card {
+    border-color: #39433b;
+    background: #222923;
+  }
+}

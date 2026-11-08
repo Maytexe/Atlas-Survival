@@ -1,0 +1,35 @@
+:root {
+  font-family: system-ui, 'Segoe UI', sans-serif;
+  color: #242820;
+  background: #f5f4ed;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+
+  --color-accent: #35684a;
+  --color-muted: #5d645b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color: #eceee6;
+    background: #181c19;
+    --color-accent: #a4d5ad;
+    --color-muted: #b6beb5;
+  }
+}

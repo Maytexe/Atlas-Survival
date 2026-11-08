@@ -26,7 +26,7 @@ Unidades e dimensões:
 |---|---|---|
 | kg, g | MASS | g (kg = 1000) |
 | L, ml | VOLUME | ml (L = 1000) |
-| unidade, pacote, lata… | COUNT | a própria unidade (COUNT de unidades diferentes nunca se soma) |
+| unidade, pacote, lata, garrafa | COUNT | a própria unidade (COUNT de unidades diferentes nunca se soma) |
 
 - Lote vencido ⇔ `expiration_date < today` (vence hoje = ainda válido). Sem validade = disponível.
 - Vence em breve ⇔ `0 ≤ expiration_date − today ≤ 30` (constante `EXPIRY_WARNING_DAYS`).
@@ -53,8 +53,15 @@ Unidades e dimensões:
 - ADJUST = delta de quantidade em um lote ("consumi 2"). O servidor aplica
   `quantity = quantity + delta` atomicamente e rejeita se ficar < 0. Ajustes não sofrem LWW
   (são comutativos); todos os outros updates usam last-write-wins por registro via `client_ts`.
+- ADJUST não altera `client_updated_at` do lote. Consumo usa ADJUST; correção manual de
+  quantidade usa UPDATE (LWW). Limitação aceita: uma correção absoluta pode sobrescrever ajustes
+  concorrentes de outro dispositivo; documentar no README.
+- UPDATE ou ADJUST sobre registro com `deleted_at` preenchido resulta em `stale`.
 - `POST /api/sync/push`: lista ordenada de mutações; cada uma em sua própria transação;
-  idempotente por `mutation.id`. Resposta por mutação: `applied | duplicate | stale | rejected(problem)`.
+  idempotente por `mutation.id`. Os resultados possíveis por mutação são
+  `applied | duplicate | stale | blocked | rejected(problem)`. O servidor decide
+  `applied | duplicate | stale | rejected`; o cliente decide `blocked` para mutações dependentes
+  de um `CREATE` rejeitado, que nunca são enviadas ao servidor.
   `rejected` NUNCA some em silêncio: fica numa lista visível "Pendências com erro".
   Caso uma mutação `CREATE` seja rejeitada, as mutações seguintes que dependam dela (mesmo `entity_id`
   ou FK para o mesmo registro) ficam `blocked` e também aparecem em "Pendências com erro".
