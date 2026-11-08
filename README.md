@@ -33,6 +33,11 @@ são exclusivas para desenvolvimento local.
 
 O frontend usa CSS Modules para estilos isolados.
 
+Os testes de banco criam e usam exclusivamente `atlas_test`; a fixture aplica e
+reverte as migrações nesse banco. Eles não acessam o banco `atlas` de desenvolvimento.
+Para inserir dados de demonstração fictícios, execute
+`uv run --directory backend python scripts/seed_dev.py` com `ENVIRONMENT=development`.
+
 A API escuta em `127.0.0.1:8000`; `GET /api/health` retorna o status da API.
 O Vite escuta em `127.0.0.1:5173`. Configure `CORS_ORIGINS` no `.env` para
 restringir as origens permitidas. O MVP não possui autenticação.
