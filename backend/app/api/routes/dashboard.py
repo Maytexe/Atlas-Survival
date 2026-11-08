@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, cast
 
 from fastapi import APIRouter
 
@@ -10,4 +10,4 @@ router = APIRouter()
 
 @router.get("/dashboard")
 async def get_dashboard(session: ReadSession, today: Today) -> dict[str, Any]:
-    return await build_dashboard(session, today)
+    return cast(dict[str, Any], await build_dashboard(session, today))

@@ -1,11 +1,13 @@
 import uuid
+from typing import cast
 
 from fastapi import APIRouter, status
 
 from app.api.deps import ReadSession, WriteSession
 from app.models import Category
 from app.schemas import CategoryCreate, CategoryRead, CategoryUpdate
-from app.services import create_category, list_active, soft_delete, update_record
+from app.services import list_active
+from app.services.registry import ENTITY_OPERATIONS
 
 router = APIRouter()
 
@@ -21,7 +23,7 @@ async def get_categories(session: ReadSession) -> list[Category]:
     status_code=status.HTTP_201_CREATED,
 )
 async def post_category(data: CategoryCreate, session: WriteSession) -> Category:
-    return await create_category(session, data)
+    return cast(Category, await ENTITY_OPERATIONS["categories"].create(session, data))
 
 
 @router.patch("/categories/{category_id}", response_model=CategoryRead)
@@ -30,9 +32,12 @@ async def patch_category(
     data: CategoryUpdate,
     session: WriteSession,
 ) -> Category:
-    return await update_record(session, Category, category_id, data)
+    return cast(
+        Category,
+        await ENTITY_OPERATIONS["categories"].update(session, category_id, data),
+    )
 
 
 @router.delete("/categories/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_category(category_id: uuid.UUID, session: WriteSession) -> None:
-    await soft_delete(session, Category, category_id)
+    await ENTITY_OPERATIONS["categories"].soft_delete(session, category_id)

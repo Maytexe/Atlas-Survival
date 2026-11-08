@@ -3,16 +3,18 @@ from typing import Any
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.services.records import ENTITY_MODELS
+from app.services.registry import ENTITY_OPERATIONS
 
 
 async def pull_changes(session: AsyncSession, cursor: int) -> dict[str, Any]:
     highest_sequences = [
-        await session.scalar(select(func.max(model.change_seq))) for model in ENTITY_MODELS.values()
+        await session.scalar(select(func.max(operation.model.change_seq)))
+        for operation in ENTITY_OPERATIONS.values()
     ]
     watermark = max([cursor, *(sequence or 0 for sequence in highest_sequences)])
     rows_by_entity: dict[str, list[Any]] = {}
-    for entity, model in ENTITY_MODELS.items():
+    for entity, operation in ENTITY_OPERATIONS.items():
+        model = operation.model
         records = await session.scalars(
             select(model)
             .where(model.change_seq > cursor, model.change_seq <= watermark)
@@ -28,7 +30,7 @@ async def pull_changes(session: AsyncSession, cursor: int) -> dict[str, Any]:
         ),
         key=lambda change: change[0],
     )
-    response: dict[str, Any] = {entity: [] for entity in ENTITY_MODELS}
+    response: dict[str, Any] = {entity: [] for entity in ENTITY_OPERATIONS}
     for _sequence, entity, record in all_changes[:1000]:
         response[entity].append(record)
     if len(all_changes) > 1000:

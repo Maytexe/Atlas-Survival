@@ -4,7 +4,8 @@ from decimal import Decimal
 from hypothesis import given
 from hypothesis import strategies as st
 
-from app.domain import calculate_autonomy, calculate_stock_availability
+from app.domain import BatchSnapshot, ItemSnapshot, calculate_autonomy, calculate_stock_availability
+from app.domain.enums import ConsumptionBasis, ItemKind, Unit
 
 
 @given(
@@ -17,16 +18,17 @@ from app.domain import calculate_autonomy, calculate_stock_availability
     ),
 )
 def test_autonomy_is_never_negative(quantity: Decimal) -> None:
-    item = {
-        "unit": "kg",
-        "daily_consumption": "0.001",
-        "consumption_basis": "HOUSEHOLD",
-        "person_count": 0,
-        "animal_count": 0,
-        "batches": [
-            {"quantity": str(quantity), "expiration_date": None},
-        ],
-    }
+    item = ItemSnapshot(
+        id="item",
+        name="Item",
+        item_kind=ItemKind.FOOD,
+        unit=Unit.KG,
+        daily_consumption=Decimal("0.001"),
+        consumption_basis=ConsumptionBasis.HOUSEHOLD,
+        person_count=0,
+        animal_count=0,
+        batches=(BatchSnapshot(id="batch", quantity=quantity, expiration_date=None),),
+    )
 
     result = calculate_autonomy(item, date(2026, 1, 15))
 
@@ -54,16 +56,14 @@ def test_expired_batches_never_contribute_to_availability(
     current_quantity: Decimal,
 ) -> None:
     result = calculate_stock_availability(
-        batches=[
-            {
-                "quantity": str(expired_quantity),
-                "expiration_date": "2026-01-14",
-            },
-            {
-                "quantity": str(current_quantity),
-                "expiration_date": "2026-01-15",
-            },
-        ],
+        batches=(
+            BatchSnapshot(
+                id="expired", quantity=expired_quantity, expiration_date=date(2026, 1, 14)
+            ),
+            BatchSnapshot(
+                id="current", quantity=current_quantity, expiration_date=date(2026, 1, 15)
+            ),
+        ),
         today=date(2026, 1, 15),
     )
 

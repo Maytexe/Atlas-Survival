@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.models.enums import MemberType
+from app.domain.enums import MemberType
 from app.schemas.common import InputModel
 
 

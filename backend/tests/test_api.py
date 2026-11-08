@@ -368,5 +368,59 @@ async def test_dashboard_and_alerts_use_injected_today_and_decimal_strings(
     assert batch.json()["quantity"] == "0.500"
     assert dashboard.json()["today"] == "2026-01-15"
     assert dashboard.json()["availability"]["FOOD:MASS"]["available"] == "500.000"
+    assert "sync_status" not in dashboard.json()
     assert any(alert["type"] == "EXPIRING_SOON" for alert in alerts.json())
     assert any(alert["type"] == "LOW_STOCK" for alert in alerts.json())
+
+
+@pytest.mark.anyio
+async def test_sync_registry_preserves_category_conflict_and_item_tombstone(
+    api_app: FastAPI,
+) -> None:
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=api_app),
+        base_url="http://test",
+    ) as client:
+        category_id = await _create_category(client, "Categoria exclusão sync")
+        item_id = await _create_item(client, category_id)
+        batch = await client.post(
+            f"/api/inventory/{item_id}/batches",
+            json={"quantity": "1.000"},
+        )
+        batch_id = batch.json()["id"]
+        mutations = [
+            {
+                "id": str(uuid.uuid4()),
+                "entity": "categories",
+                "op": "DELETE",
+                "entity_id": category_id,
+                "payload": {},
+                "client_ts": "2030-01-15T12:00:00Z",
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "entity": "inventory_items",
+                "op": "DELETE",
+                "entity_id": item_id,
+                "payload": {},
+                "client_ts": "2030-01-15T12:01:00Z",
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "entity": "categories",
+                "op": "DELETE",
+                "entity_id": category_id,
+                "payload": {},
+                "client_ts": "2030-01-15T12:02:00Z",
+            },
+        ]
+        response = await client.post("/api/sync/push", json={"mutations": mutations})
+        pulled = await client.get("/api/sync/pull", params={"cursor": 0})
+
+    results = response.json()["results"]
+    assert [result["status"] for result in results] == ["rejected", "applied", "applied"]
+    assert results[0]["problem"]["status"] == 409
+    item = next(row for row in pulled.json()["inventory_items"] if row["id"] == item_id)
+    batch_record = next(row for row in pulled.json()["stock_batches"] if row["id"] == batch_id)
+    assert item["deleted_at"] is not None
+    assert batch_record["deleted_at"] is not None

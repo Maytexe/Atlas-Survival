@@ -3,10 +3,12 @@ applyTo: "backend/**/*.py"
 ---
 - Organize `app/` by responsibility: `core/{config,errors,clock}.py`;
   `db/{engine,session,writes}.py`;
-  `models/{base,enums,mixins,member,category,inventory_item,stock_batch,processed_mutation}.py`;
+  `models/{base,enums,mixins,member,category,inventory_item,stock_batch,processed_mutation}.py`
+  (os enums de domínio têm definição única em `domain/enums.py`);
   `schemas/{common,member,category,inventory,batch,dashboard,alert,sync}.py`;
-  `domain/{units,expiry,availability,consumption,autonomy,alerts}.py`;
-  `services/{member,category,inventory,batch,dashboard,alert,records}.py` and
+  `domain/{enums,types,units,expiry,availability,consumption,autonomy,alerts,dashboard}.py`;
+  regras recebem snapshots tipados e imutáveis;
+  `services/{member,category,inventory,batch,dashboard,alert,messages,records,registry}.py` and
   `services/sync/{push,pull}.py`; `api/{deps,router}.py` and
   `api/routes/{health,members,categories,inventory,batches,dashboard,alerts,sync}.py`.
 - Keep each `backend/app` Python file at approximately 250 lines or fewer.

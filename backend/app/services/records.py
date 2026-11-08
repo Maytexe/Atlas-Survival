@@ -3,21 +3,13 @@ from datetime import UTC, datetime
 from typing import cast
 
 from pydantic import BaseModel
-from sqlalchemy import select, update
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.errors import conflict, not_found
+from app.core.errors import not_found
 from app.models import Category, HouseholdMember, InventoryItem, StockBatch
-from app.schemas import InventoryUpdate
 
 Record = HouseholdMember | Category | InventoryItem | StockBatch
-EntityModel = type[HouseholdMember] | type[Category] | type[InventoryItem] | type[StockBatch]
-ENTITY_MODELS: dict[str, EntityModel] = {
-    "household_members": HouseholdMember,
-    "categories": Category,
-    "inventory_items": InventoryItem,
-    "stock_batches": StockBatch,
-}
 
 
 def now_utc() -> datetime:
@@ -75,10 +67,6 @@ async def update_record[T: (HouseholdMember, Category, InventoryItem, StockBatch
     record = cast(Record | None, await session.get(model, entity_id))
     if record is None or record.deleted_at is not None:
         raise not_found("O registro solicitado não foi encontrado.")
-    if model is InventoryItem and isinstance(data, InventoryUpdate):
-        category_id = data.category_id
-        if category_id is not None:
-            await get_active(session, Category, category_id)
     for field, value in data.model_dump(exclude_unset=True).items():
         setattr(record, field, value)
     record.client_updated_at = client_ts or now_utc()
@@ -97,23 +85,6 @@ async def soft_delete(
     if record is None or record.deleted_at is not None:
         raise not_found("O registro solicitado não foi encontrado.")
     timestamp = client_ts or now_utc()
-    if model is Category:
-        active_item = await session.scalar(
-            select(InventoryItem.id)
-            .where(
-                InventoryItem.category_id == entity_id,
-                InventoryItem.deleted_at.is_(None),
-            )
-            .limit(1)
-        )
-        if active_item is not None:
-            raise conflict("Não é possível excluir uma categoria que possui itens ativos.")
-    if model is InventoryItem:
-        await session.execute(
-            update(StockBatch)
-            .where(StockBatch.inventory_item_id == entity_id)
-            .values(deleted_at=timestamp, client_updated_at=timestamp)
-        )
     record.deleted_at = timestamp
     record.client_updated_at = timestamp
     await session.flush()

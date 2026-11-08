@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.models.enums import ConsumptionBasis, ItemKind, Unit
+from app.domain.enums import ConsumptionBasis, ItemKind, Unit
 from app.schemas.common import DecimalInput, DecimalString, InputModel
 
 

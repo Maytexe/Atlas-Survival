@@ -1,3 +1,13 @@
-from typing import Any
+from typing import TypedDict
 
-type DashboardData = dict[str, Any]
+
+class DashboardData(TypedDict):
+    total_items: int
+    total_members: int
+    people: int
+    animals: int
+    availability: dict[str, dict[str, str]]
+    expired_batches: int
+    expiring_soon_batches: int
+    autonomy: list[dict[str, object]]
+    today: str

@@ -2,36 +2,14 @@ import enum
 
 from sqlalchemy import Enum
 
+from app.domain.enums import ConsumptionBasis, ItemKind, MemberType, Unit
 
-class MemberType(enum.StrEnum):
-    PERSON = "PERSON"
-    ANIMAL = "ANIMAL"
-
-
-class ItemKind(enum.StrEnum):
-    FOOD = "FOOD"
-    WATER = "WATER"
-    OTHER = "OTHER"
+__all__ = ["ConsumptionBasis", "ItemKind", "MemberType", "Unit", "varchar_enum"]
 
 
-class Unit(enum.StrEnum):
-    KG = "kg"
-    G = "g"
-    L = "L"
-    ML = "ml"
-    UNIDADE = "unidade"
-    PACOTE = "pacote"
-    LATA = "lata"
-    GARRAFA = "garrafa"
-
-
-class ConsumptionBasis(enum.StrEnum):
-    HOUSEHOLD = "HOUSEHOLD"
-    PER_PERSON = "PER_PERSON"
-    PER_ANIMAL = "PER_ANIMAL"
-
-
-def _enum_values(enum_class: type[enum.Enum]) -> list[str]:
+def _enum_values(
+    enum_class: type[enum.Enum],
+) -> list[str]:
     return [member.value for member in enum_class]
 
 

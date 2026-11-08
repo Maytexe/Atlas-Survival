@@ -1,0 +1,89 @@
+[
+  {
+    "name": "disponibilidade agregada por dimensão, unidade base e validade",
+    "today": "2026-01-15",
+    "items": [
+      {
+        "id": "farinha",
+        "name": "Farinha",
+        "item_kind": "FOOD",
+        "unit": "kg",
+        "daily_consumption": "1.000",
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": [
+          {"id": "farinha-hoje", "quantity": "2.000", "expiration_date": "2026-01-15"},
+          {"id": "farinha-amanha", "quantity": "1.000", "expiration_date": "2026-01-16"}
+        ]
+      },
+      {
+        "id": "latas",
+        "name": "Latas",
+        "item_kind": "FOOD",
+        "unit": "lata",
+        "daily_consumption": null,
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": [
+          {"id": "lata-1", "quantity": "3.000", "expiration_date": "2026-02-15"}
+        ]
+      },
+      {
+        "id": "agua",
+        "name": "Agua",
+        "item_kind": "WATER",
+        "unit": "ml",
+        "daily_consumption": "100.000",
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": [
+          {"id": "agua-vencida", "quantity": "1000.000", "expiration_date": "2026-01-14"},
+          {"id": "agua-validade", "quantity": "200.000", "expiration_date": "2026-02-14"}
+        ]
+      }
+    ],
+    "expected": {
+      "availability": {
+        "FOOD:COUNT:lata": {"available": "3.000"},
+        "FOOD:MASS": {"available": "3000.000"},
+        "WATER:VOLUME": {"available": "200.000"}
+      },
+      "expired_batches": 1,
+      "expiring_soon_batches": 3,
+      "autonomy": [
+        {
+          "item_kind": "FOOD",
+          "dimension": "MASS",
+          "days": 3,
+          "coverage_count": 1,
+          "total_items": 1,
+          "coverage_label": "calculado com 1 de 1 itens",
+          "limiting_item": "farinha"
+        },
+        {
+          "item_kind": "WATER",
+          "dimension": "VOLUME",
+          "days": 2,
+          "coverage_count": 1,
+          "total_items": 1,
+          "coverage_label": "calculado com 1 de 1 itens",
+          "limiting_item": "agua"
+        }
+      ]
+    }
+  },
+  {
+    "name": "dashboard vazio",
+    "today": "2026-01-15",
+    "items": [],
+    "expected": {
+      "availability": {},
+      "expired_batches": 0,
+      "expiring_soon_batches": 0,
+      "autonomy": []
+    }
+  }
+]

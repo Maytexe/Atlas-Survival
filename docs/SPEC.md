@@ -42,7 +42,8 @@ Unidades e dimensões:
   configurável, só quando há consumo), NO_CONSUMPTION_DATA (INFO).
   Ordenar por severidade e depois por data.
 - Dashboard: total de itens, pessoas/animais, disponibilidade de alimentos e de água por
-  dimensão, lotes vencidos, lotes a vencer em 30 dias, autonomia (food/water), status de sync.
+  dimensão, lotes vencidos, lotes a vencer em 30 dias e autonomia (food/water).
+  O estado de sincronização é responsabilidade do cliente e não integra a resposta do dashboard.
 
 ## 3. Sincronização
 - Toda escrita do usuário vai para o Dexie + outbox. Mutação:

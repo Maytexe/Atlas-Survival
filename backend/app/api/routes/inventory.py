@@ -1,11 +1,13 @@
 import uuid
+from typing import cast
 
 from fastapi import APIRouter, status
 
 from app.api.deps import ReadSession, WriteSession
 from app.models import InventoryItem
 from app.schemas import InventoryCreate, InventoryRead, InventoryUpdate
-from app.services import create_inventory_item, list_active, soft_delete, update_record
+from app.services import list_active
+from app.services.registry import ENTITY_OPERATIONS
 
 router = APIRouter()
 
@@ -24,7 +26,7 @@ async def post_inventory_item(
     data: InventoryCreate,
     session: WriteSession,
 ) -> InventoryItem:
-    return await create_inventory_item(session, data)
+    return cast(InventoryItem, await ENTITY_OPERATIONS["inventory_items"].create(session, data))
 
 
 @router.patch("/inventory/{item_id}", response_model=InventoryRead)
@@ -33,9 +35,12 @@ async def patch_inventory_item(
     data: InventoryUpdate,
     session: WriteSession,
 ) -> InventoryItem:
-    return await update_record(session, InventoryItem, item_id, data)
+    return cast(
+        InventoryItem,
+        await ENTITY_OPERATIONS["inventory_items"].update(session, item_id, data),
+    )
 
 
 @router.delete("/inventory/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_inventory_item(item_id: uuid.UUID, session: WriteSession) -> None:
-    await soft_delete(session, InventoryItem, item_id)
+    await ENTITY_OPERATIONS["inventory_items"].soft_delete(session, item_id)

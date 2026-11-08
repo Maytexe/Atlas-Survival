@@ -11,8 +11,9 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
+from app.domain.enums import ConsumptionBasis, ItemKind, Unit
 from app.models.base import Base
-from app.models.enums import ConsumptionBasis, ItemKind, Unit, varchar_enum
+from app.models.enums import varchar_enum
 from app.models.mixins import SyncColumnsMixin, UUIDPrimaryKeyMixin
 
 

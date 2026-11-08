@@ -1,9 +1,9 @@
-
 from sqlalchemy import CheckConstraint, Index, String
 from sqlalchemy.orm import Mapped, mapped_column
 
+from app.domain.enums import MemberType
 from app.models.base import Base
-from app.models.enums import MemberType, varchar_enum
+from app.models.enums import varchar_enum
 from app.models.mixins import SyncColumnsMixin, UUIDPrimaryKeyMixin
 
 
