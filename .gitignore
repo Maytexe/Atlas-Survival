@@ -1,0 +1,22 @@
+# segredos e ambiente
+.env
+.env.*
+!.env.example
+
+# python
+.venv/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# node
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+
+# diversos
+*.log
+.DS_Store

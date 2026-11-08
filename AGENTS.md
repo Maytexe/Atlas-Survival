@@ -44,3 +44,6 @@ registre a ideia em `docs/BACKLOG.md` e siga.
   tomadas e pendências. Depois PARE e aguarde aprovação.
 - Se algo for ambíguo, escolha a opção mais simples, registre em
   `docs/decisions/NNN-titulo.md` (5 linhas) e continue.
+
+- Ambiente: Windows 11 + PowerShell. Todo comando documentado deve funcionar em PowerShell.
+  Não usar Makefile nem scripts bash. Para tarefas, use `just` (justfile) ou scripts do package.json.

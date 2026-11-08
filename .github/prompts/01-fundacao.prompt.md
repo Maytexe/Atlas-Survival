@@ -10,7 +10,7 @@ Criar:
 - Backend: pyproject (uv), core/config (pydantic-settings), engine e session async, main.py com
   /api/health, CORS restrito por env, logging.
 - Frontend: Vite + React + TS strict, ESLint, Prettier, Vitest, estilização escolhida, alias @/.
-- Makefile ou justfile (dev, test, lint, db-up, migrate).
+- justfile (just) com as tarefas dev, test, lint, db-up e migrate.
 - .github/workflows/ci.yml (lint + typecheck + test com serviço Postgres) e README inicial.
 Fora de escopo: models, telas, PWA.
 Pronto quando: `docker compose up -d` saudável, GET /api/health = 200, os comandos de
