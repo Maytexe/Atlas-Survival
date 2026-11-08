@@ -2,10 +2,13 @@
 
 ## 1. Modelo de dados
 Todas as tabelas têm: `id UUID` (gerado no CLIENTE; o servidor aceita), `created_at`,
-`updated_at`, `change_seq BIGINT` (sequence global do Postgres, atribuída a cada escrita;
-base do pull), `deleted_at` (tombstone só para propagar exclusões; nunca exibir; queries de
-negócio filtram `deleted_at IS NULL`). Excluir item = tombstone do item e dos seus lotes,
-numa transação.
+`updated_at`, `client_updated_at` (timestamptz, usado no LWW do sync), `change_seq BIGINT`
+(sequence global do Postgres, atribuída a cada escrita; base do pull), `deleted_at`
+(tombstone só para propagar exclusões; nunca exibir; queries de negócio filtram
+`deleted_at IS NULL`). Excluir item = tombstone do item e dos seus lotes, numa transação.
+
+Unidades permitidas (enum fechado): `kg`, `g`, `L`, `ml`, `unidade`, `pacote`, `lata`,
+`garrafa`. A dimensão segue a regra do §2: MASS, VOLUME ou COUNT.
 
 - household_members: name, member_type (PERSON|ANIMAL), age (opcional, ≥ 0), notes
 - categories: name (único, case-insensitive), description
@@ -44,12 +47,17 @@ Unidades e dimensões:
 ## 3. Sincronização
 - Toda escrita do usuário vai para o Dexie + outbox. Mutação:
   `{id (UUID = idempotency key), entity, op: CREATE|UPDATE|DELETE|ADJUST, entity_id, payload, client_ts, attempts}`.
+- `client_updated_at` é o timestamp do último cliente que alterou o registro em cada tabela sincronizável.
+  O LWW do registro aplica-se quando `mutation.client_ts >= record.client_updated_at`; se o valor do cliente
+  for anterior, o resultado da mutação é `stale` e o servidor rejeita a escrita.
 - ADJUST = delta de quantidade em um lote ("consumi 2"). O servidor aplica
   `quantity = quantity + delta` atomicamente e rejeita se ficar < 0. Ajustes não sofrem LWW
   (são comutativos); todos os outros updates usam last-write-wins por registro via `client_ts`.
 - `POST /api/sync/push`: lista ordenada de mutações; cada uma em sua própria transação;
   idempotente por `mutation.id`. Resposta por mutação: `applied | duplicate | stale | rejected(problem)`.
   `rejected` NUNCA some em silêncio: fica numa lista visível "Pendências com erro".
+  Caso uma mutação `CREATE` seja rejeitada, as mutações seguintes que dependam dela (mesmo `entity_id`
+  ou FK para o mesmo registro) ficam `blocked` e também aparecem em "Pendências com erro".
 - `GET /api/sync/pull?cursor=N`: entidades com `change_seq > N` (incluindo tombstones) + novo cursor.
 - Gatilhos: evento `online`, abertura do app, `visibilitychange`, após mutação (debounce),
   botão manual. Backoff exponencial com jitter. NÃO depender de Background Sync API.
