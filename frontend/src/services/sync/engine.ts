@@ -32,6 +32,13 @@ export class SyncEngine {
     return this.running
   }
 
+  async retryErrors(): Promise<void> {
+    await this.database.outbox
+      .where('status')
+      .anyOf('rejected', 'blocked')
+      .modify({ status: 'pending' })
+  }
+
   async discard(mutationId: string): Promise<void> {
     const completed = await this.withCrossTabLock(async () => {
       let discarded: OutboxEntry | undefined

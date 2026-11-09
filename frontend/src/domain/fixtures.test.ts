@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import Decimal from 'decimal.js'
 import { describe, expect, it } from 'vitest'
 import {
@@ -31,8 +32,8 @@ interface FixtureItem {
 }
 
 function readFixture<T>(name: string): T {
-  const url = new URL(`../../../shared/fixtures/${name}`, import.meta.url)
-  return JSON.parse(readFileSync(url, 'utf8')) as T
+  const path = resolve(process.cwd(), '..', 'shared', 'fixtures', name)
+  return JSON.parse(readFileSync(path, 'utf8')) as T
 }
 
 function fromFixtureBatch(batch: FixtureBatch): BatchSnapshot {

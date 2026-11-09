@@ -1,0 +1,154 @@
+.notice {
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+.notice-error {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 9%, var(--color-panel));
+}
+.notice-info {
+  border-color: var(--color-info);
+  color: var(--color-info);
+}
+.notice-warning {
+  border-color: var(--color-warning);
+  color: var(--color-warning);
+}
+.empty-state,
+.skeleton {
+  padding: 1.5rem;
+  border-radius: 10px;
+  color: var(--color-muted);
+  background: var(--color-soft);
+}
+.skeleton {
+  animation: pulse 1.4s ease-in-out infinite alternate;
+}
+@keyframes pulse {
+  to {
+    opacity: 0.55;
+  }
+}
+.status-pill {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 750;
+}
+.status-good {
+  color: var(--color-accent-strong);
+}
+.status-warning,
+.severity-warning {
+  color: var(--color-warning);
+}
+.status-critical,
+.severity-critical {
+  color: var(--color-danger);
+}
+.severity-info {
+  color: var(--color-info);
+}
+.sync-badge {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 0.55rem;
+  align-items: center;
+  color: var(--color-accent-strong);
+}
+.sync-icon {
+  grid-row: span 2;
+  font-size: 1.3rem;
+}
+.sync-detail,
+.sync-time {
+  color: var(--color-muted);
+  font-size: 0.78rem;
+}
+.sync-offline,
+.sync-erro {
+  color: var(--color-danger);
+}
+.sync-sincronizando {
+  color: var(--color-warning);
+}
+.alert-row {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+.alert-content {
+  display: grid;
+  gap: 0.3rem;
+}
+.alert-content a {
+  font-weight: 650;
+}
+.alert-content time {
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+.mutation-list li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.mutation-list code {
+  overflow-wrap: anywhere;
+}
+.mutation-error {
+  align-items: flex-start;
+}
+.mutation-error p {
+  margin: 0.35rem 0 0;
+  color: var(--color-danger);
+}
+.error-queue {
+  margin-top: 1rem;
+}
+.item-detail-summary {
+  margin-bottom: 1.5rem;
+}
+.batch-card {
+  display: grid;
+  gap: 0.7rem;
+}
+.batch-card p {
+  margin: 0;
+}
+.batch-first {
+  border-color: var(--color-accent);
+}
+.consume-custom {
+  display: flex;
+  gap: 0.4rem;
+}
+.consume-custom input {
+  min-width: 130px;
+}
+.undo-snackbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  background: var(--color-soft);
+}
+.back-link {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+.backup-panel {
+  margin-top: 1rem;
+}

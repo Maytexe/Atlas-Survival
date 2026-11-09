@@ -11,3 +11,8 @@ export const syncEngine = new SyncEngine({
     void useSyncStore.getState().refreshCounts()
   },
 })
+
+export async function retrySyncErrors(): Promise<void> {
+  await syncEngine.retryErrors()
+  await syncEngine.sync()
+}

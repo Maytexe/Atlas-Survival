@@ -1,0 +1,132 @@
+:root {
+  font-family: system-ui, 'Segoe UI', sans-serif;
+  color: #242820;
+  background: #f5f4ed;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --color-accent: #35684a;
+  --color-accent-strong: #234b34;
+  --color-muted: #596258;
+  --color-border: #d7dbd1;
+  --color-panel: #fff;
+  --color-page: #f5f4ed;
+  --color-soft: #edf2eb;
+  --color-danger: #9c2f2f;
+  --color-warning: #744d00;
+  --color-info: #27537a;
+  color-scheme: light;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  color: #eceee6;
+  background: #181c19;
+  --color-accent: #a4d5ad;
+  --color-accent-strong: #c5e8ca;
+  --color-muted: #b6beb5;
+  --color-border: #414941;
+  --color-panel: #232a25;
+  --color-page: #181c19;
+  --color-soft: #303b33;
+  --color-danger: #ff9a91;
+  --color-warning: #f5cc72;
+  --color-info: #9cc9f1;
+}
+
+:root[data-theme='red-night'] {
+  color-scheme: dark;
+  color: #f2d9d4;
+  background: #170c0c;
+  --color-accent: #dc7168;
+  --color-accent-strong: #f19488;
+  --color-muted: #c4a6a2;
+  --color-border: #57302e;
+  --color-panel: #241313;
+  --color-page: #170c0c;
+  --color-soft: #341b1a;
+  --color-danger: #ff9a91;
+  --color-warning: #f5cc72;
+  --color-info: #c3b4eb;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    color: #eceee6;
+    background: #181c19;
+    --color-accent: #a4d5ad;
+    --color-accent-strong: #c5e8ca;
+    --color-muted: #b6beb5;
+    --color-border: #414941;
+    --color-panel: #232a25;
+    --color-page: #181c19;
+    --color-soft: #303b33;
+    --color-danger: #ff9a91;
+    --color-warning: #f5cc72;
+    --color-info: #9cc9f1;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: var(--color-page);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+a {
+  color: var(--color-accent-strong);
+}
+:focus-visible {
+  outline: 3px solid #d88a26;
+  outline-offset: 3px;
+}
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+h1 {
+  font-size: clamp(1.45rem, 3vw, 2rem);
+}
+h2 {
+  font-size: 1.15rem;
+}
+.muted,
+small {
+  color: var(--color-muted);
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

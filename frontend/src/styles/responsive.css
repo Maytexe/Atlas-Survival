@@ -1,0 +1,80 @@
+@media (max-width: 800px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+  }
+  .sidebar-open {
+    transform: translateX(0);
+  }
+  .app-main {
+    margin-left: 0;
+  }
+  .menu-toggle {
+    position: fixed;
+    z-index: 30;
+    top: 0.7rem;
+    left: 0.7rem;
+    display: inline-flex !important;
+  }
+  .drawer-backdrop {
+    position: fixed;
+    z-index: 15;
+    inset: 0;
+    display: block;
+    border: 0;
+    background: #0008;
+  }
+  .topbar {
+    min-height: 72px;
+    justify-content: flex-end;
+    padding: 0.5rem 0.75rem 0.5rem 8.5rem;
+  }
+  .page-content {
+    padding: 1.25rem 1rem 2rem;
+  }
+  .global-notices {
+    padding: 0.5rem 1rem 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-sections {
+    grid-template-columns: 1fr;
+  }
+  .panel-wide {
+    grid-column: auto;
+  }
+  .page-heading,
+  .section-heading,
+  .record-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .inventory-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .filter-row {
+    grid-template-columns: 1fr;
+  }
+  .page-heading .button {
+    align-self: flex-start;
+  }
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .sync-detail,
+  .sync-time {
+    font-size: 0.7rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
