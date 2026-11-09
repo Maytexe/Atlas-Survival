@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { CategoryForm } from '@/components/CategoryForm'
 import { PageHeading } from '@/components/PageHeading'
+import { SidePanel } from '@/components/SidePanel'
 import { StatusPanel } from '@/components/StatusPanel'
 import { useLocalData } from '@/hooks/use-local-data'
 import { messages } from '@/i18n/pt-BR'
+import { formatPlural } from '@/services/format'
 import { deleteCategory } from '@/services/repositories'
 import type { Category } from '@/db'
 
@@ -43,7 +45,13 @@ export function CategoriesPage() {
         }
       />
       {formOpen && (
-        <section className="panel form-panel">
+        <SidePanel
+          title={editing ? messages.editCategoryTitle : messages.addCategory}
+          onClose={() => {
+            setFormOpen(false)
+            setEditing(undefined)
+          }}
+        >
           <CategoryForm
             {...(editing ? { category: editing } : {})}
             onSaved={() => {
@@ -55,7 +63,7 @@ export function CategoriesPage() {
               setEditing(undefined)
             }}
           />
-        </section>
+        </SidePanel>
       )}
       {actionError && (
         <p className="notice notice-error" role="alert">
@@ -79,9 +87,10 @@ export function CategoriesPage() {
                   <strong>{category.name}</strong>
                   {category.description && <p>{category.description}</p>}
                   <p className="muted">
-                    {messages.activeItemCount.replace(
-                      '{count}',
-                      String(itemCount),
+                    {formatPlural(
+                      itemCount,
+                      messages.itemCountSingular.replace('1 ', ''),
+                      messages.itemCountPlural.replace('{count} ', ''),
                     )}
                   </p>
                 </div>

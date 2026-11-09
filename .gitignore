@@ -20,3 +20,11 @@ test-results/
 # diversos
 *.log
 .DS_Store
+# Capturas de revisão visual
+screenshots/
+
+# documentação local (não versionar)
+docs/
+
+# pacote avulso de cards
+atlas-cards.zip

@@ -1,0 +1,272 @@
+.icon-button {
+  display: inline-grid;
+  width: 48px;
+  min-width: 48px;
+  height: 48px;
+  place-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  color: var(--color-accent-strong);
+  background: var(--color-panel);
+  cursor: pointer;
+}
+
+.info-tip {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.info-tip-trigger {
+  width: 48px;
+  height: 48px;
+  border: 0;
+}
+
+.info-tip-bubble {
+  position: fixed;
+  z-index: 80;
+  width: min(320px, calc(100vw - 24px));
+  max-height: min(70vh, 500px);
+  overflow: auto;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+  color: var(--color-text);
+  background: var(--color-panel);
+  box-shadow: 0 8px 24px #0003;
+  font-size: 0.9rem;
+}
+
+.info-tip-bubble p {
+  margin: 0;
+}
+
+.info-tip-bubble dl {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.info-tip-bubble dl div {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 0.5rem;
+}
+
+.info-tip-bubble dt {
+  color: var(--color-muted);
+  font-weight: 700;
+}
+
+.info-tip-bubble dd {
+  margin: 0;
+}
+
+.side-panel-scrim {
+  position: fixed;
+  z-index: 70;
+  inset: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0;
+  background: #0008;
+}
+
+.side-panel {
+  width: min(560px, 100%);
+  height: 100%;
+  overflow-y: auto;
+  padding: 1.25rem;
+  border-left: 1px solid var(--color-border);
+  color: var(--color-text);
+  background: var(--color-panel);
+  box-shadow: -8px 0 32px #0002;
+}
+
+.side-panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.side-panel-heading h2 {
+  margin: 0;
+}
+
+.notice {
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+}
+
+.notice-error {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 9%, var(--color-panel));
+}
+
+.notice-info {
+  border-color: var(--color-info);
+  color: var(--color-info);
+}
+
+.notice-warning {
+  border-color: var(--color-warning);
+  color: var(--color-warning);
+}
+
+.empty-state,
+.skeleton {
+  padding: 1.5rem;
+  border-radius: var(--radius-medium);
+  color: var(--color-muted);
+  background: var(--color-soft);
+}
+
+.skeleton {
+  animation: pulse 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  to {
+    opacity: 0.55;
+  }
+}
+
+.status-pill {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.status-good {
+  color: var(--color-good);
+}
+
+.status-warning,
+.severity-warning {
+  color: var(--color-warning);
+}
+
+.status-critical,
+.severity-critical {
+  color: var(--color-danger);
+}
+
+.severity-info {
+  color: var(--color-info);
+}
+
+.sync-badge {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 0.55rem;
+  align-items: center;
+  color: var(--color-good);
+}
+
+.sync-icon {
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+}
+
+.sync-detail,
+.sync-time {
+  color: var(--color-muted);
+  font-size: 0.78rem;
+}
+
+.sync-offline,
+.sync-erro {
+  color: var(--color-danger);
+}
+
+.sync-sincronizando {
+  color: var(--color-warning);
+}
+
+.alert-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+}
+
+.alert-content {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.alert-content a {
+  font-weight: 650;
+}
+
+.alert-content time {
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+.alert-group {
+  margin-bottom: 1.5rem;
+}
+
+.alert-group-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.mutation-list {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.mutation-list li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.mutation-list code {
+  overflow-wrap: anywhere;
+}
+
+.mutation-error {
+  align-items: flex-start;
+}
+
+.mutation-error p {
+  margin: 0.35rem 0 0;
+  color: var(--color-danger);
+}
+
+.error-queue {
+  margin-top: 1rem;
+}
+
+.back-link {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.backup-panel {
+  margin-top: 1rem;
+}

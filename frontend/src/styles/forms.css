@@ -1,6 +1,5 @@
 .availability-list,
-.autonomy-list,
-.mutation-list {
+.autonomy-list {
   display: grid;
   gap: 0.75rem;
   padding: 0;
@@ -42,6 +41,33 @@
   gap: 0.4rem;
   font-weight: 600;
 }
+.input-with-suffix {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.input-with-suffix input {
+  min-width: 0;
+  flex: 1;
+}
+.input-with-suffix > span {
+  flex: 0 0 auto;
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+.consumption-sentence {
+  color: var(--color-muted);
+  font-weight: 400;
+}
+.batch-shortcut-group,
+.item-kind-cards {
+  min-width: 0;
+  margin: 0;
+}
+.batch-shortcut-group {
+  padding: 0;
+  border: 0;
+}
 input,
 select,
 textarea {
@@ -49,7 +75,7 @@ textarea {
   min-height: 48px;
   padding: 0.65rem 0.75rem;
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: var(--radius-medium);
   color: inherit;
   background: var(--color-panel);
 }
@@ -76,16 +102,12 @@ textarea {
   align-items: center;
   padding: 0.65rem 1rem;
   border: 1px solid var(--color-accent);
-  border-radius: 8px;
-  color: #fff;
-  background: #35684a;
+  border-radius: var(--radius-medium);
+  color: var(--color-button-text);
+  background: var(--color-accent);
   font-weight: 650;
   text-decoration: none;
   cursor: pointer;
-}
-:root[data-theme='dark'] .button,
-:root[data-theme='red-night'] .button {
-  color: #182019;
 }
 .button:hover:not(:disabled) {
   filter: brightness(1.1);
@@ -98,66 +120,20 @@ textarea {
   color: var(--color-accent-strong);
   background: var(--color-panel);
 }
+.button svg {
+  flex: 0 0 auto;
+}
 .button-danger {
   border-color: var(--color-danger);
   color: var(--color-danger);
   background: transparent;
 }
 .button-small {
-  min-height: 42px;
+  min-height: 48px;
   padding: 0.45rem 0.7rem;
-}
-.record-row,
-.batch-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
-}
-.record-row {
-  padding: 0.25rem 0 1rem;
-  border-bottom: 1px solid var(--color-border);
-}
-.record-row:last-child {
-  padding-bottom: 0;
-  border-bottom: 0;
-}
-.record-row p {
-  margin: 0.35rem 0 0;
-}
-.filter-row {
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(180px, 1fr);
-  gap: 0.75rem;
-  margin-bottom: 1rem;
 }
 .filter-row label {
   display: grid;
   gap: 0.4rem;
   font-weight: 600;
-}
-.inventory-list {
-  display: grid;
-  gap: 0.9rem;
-}
-.inventory-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  padding-bottom: 0.9rem;
-  border-bottom: 1px solid var(--color-border);
-}
-.inventory-row:last-child {
-  padding-bottom: 0;
-  border-bottom: 0;
-}
-.inventory-row-main {
-  display: grid;
-  justify-items: start;
-  gap: 0.3rem;
-}
-.inventory-item-name {
-  font-size: 1.05rem;
-  font-weight: 700;
 }

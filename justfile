@@ -5,7 +5,8 @@ default:
 
 dev:
     docker compose up -d
-    just --parallel backend-dev frontend-dev
+    Start-Process -FilePath 'powershell.exe' -WorkingDirectory (Get-Location).Path -ArgumentList @('-NoLogo', '-NoProfile', '-NoExit', '-Command', 'just backend-dev') -PassThru | Select-Object -ExpandProperty Id
+    Start-Process -FilePath 'powershell.exe' -WorkingDirectory (Get-Location).Path -ArgumentList @('-NoLogo', '-NoProfile', '-NoExit', '-Command', 'just frontend-dev') -PassThru | Select-Object -ExpandProperty Id
 
 backend-dev:
     uv run --directory backend uvicorn app.main:app --reload --host 127.0.0.1
@@ -48,6 +49,7 @@ frontend-check:
     npm --prefix frontend run build
 
 e2e:
-    throw "Playwright será configurado na Etapa 6."
+    docker compose up -d
+    uv run --directory backend python scripts/e2e.py
 
 all: backend-check frontend-check

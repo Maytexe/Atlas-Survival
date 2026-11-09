@@ -1,15 +1,19 @@
 import { useEffect, useState } from 'react'
 import { z } from 'zod'
-import { PageHeading } from '@/components/PageHeading'
+import { BackupPanel } from '@/components/BackupPanel'
+import { InfoTip } from '@/components/InfoTip'
 import { InlineError } from '@/components/InlineError'
+import { PageHeading } from '@/components/PageHeading'
+import { useGoals } from '@/hooks/use-goals'
 import { useSettings } from '@/hooks/use-settings'
 import { messages } from '@/i18n/pt-BR'
-import { exportBackup, importBackup, validateBackup } from '@/services/backup'
-import { saveSettings, type AppSettings } from '@/services/preferences'
+import { type AppSettings } from '@/services/preferences'
 
 const settingsSchema = z.object({
   theme: z.enum(['system', 'light', 'dark', 'red-night']),
   lowStockDays: z.number().finite().min(0).max(3650),
+  goalFoodDays: z.number().int().min(1).max(365).nullable(),
+  goalWaterDays: z.number().int().min(1).max(365).nullable(),
   timeZone: z.string().refine((value) => {
     try {
       new Intl.DateTimeFormat('pt-BR', { timeZone: value })
@@ -22,18 +26,10 @@ const settingsSchema = z.object({
 
 export function SettingsPage() {
   const { settings: storedSettings, error: settingsError } = useSettings()
+  const { saveGoals } = useGoals()
   const [draftSettings, setDraftSettings] = useState<AppSettings | null>(null)
   const [error, setError] = useState<unknown>(null)
   const [feedback, setFeedback] = useState('')
-  const [backupCounts, setBackupCounts] = useState<{
-    members: number
-    categories: number
-    items: number
-    batches: number
-  } | null>(null)
-  const [backupFile, setBackupFile] = useState<File | null>(null)
-  const [importing, setImporting] = useState(false)
-
   const settings = draftSettings ?? storedSettings
 
   useEffect(() => {
@@ -53,68 +49,26 @@ export function SettingsPage() {
     setFeedback('')
     const result = settingsSchema.safeParse(settings)
     if (!result.success) {
-      setError(new Error(messages.formLowStockInvalid))
+      const invalidGoal = result.error.issues.some(
+        (issue) =>
+          issue.path[0] === 'goalFoodDays' || issue.path[0] === 'goalWaterDays',
+      )
+      setError(
+        new Error(
+          invalidGoal ? messages.goalDaysInvalid : messages.formLowStockInvalid,
+        ),
+      )
       return
     }
     try {
-      await saveSettings(result.data)
+      await saveGoals(
+        result.data.goalFoodDays,
+        result.data.goalWaterDays,
+        result.data,
+      )
       setFeedback(messages.settingsSaved)
     } catch (cause) {
       setError(cause)
-    }
-  }
-
-  const downloadBackup = async () => {
-    try {
-      const backup = await exportBackup()
-      const blob = new Blob([JSON.stringify(backup, null, 2)], {
-        type: 'application/json',
-      })
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = `atlas-backup-${new Date().toISOString().slice(0, 10)}.json`
-      link.click()
-      URL.revokeObjectURL(url)
-      setFeedback(messages.backupExported)
-    } catch (cause) {
-      setError(cause)
-    }
-  }
-
-  const selectBackup = async (file: File | null) => {
-    setBackupFile(file)
-    setBackupCounts(null)
-    if (!file) return
-    setError(null)
-    try {
-      const parsed = JSON.parse(await file.text()) as unknown
-      const backup = validateBackup(parsed)
-      setBackupCounts({
-        members: backup.household_members.length,
-        categories: backup.categories.length,
-        items: backup.inventory_items.length,
-        batches: backup.stock_batches.length,
-      })
-    } catch {
-      setError(new Error(messages.invalidBackup))
-    }
-  }
-
-  const doImport = async () => {
-    if (!backupFile || !backupCounts || !window.confirm(messages.confirmImport))
-      return
-    setImporting(true)
-    setError(null)
-    try {
-      await importBackup(JSON.parse(await backupFile.text()) as unknown)
-      setFeedback(messages.backupImported)
-      setBackupFile(null)
-      setBackupCounts(null)
-    } catch (cause) {
-      setError(cause)
-    } finally {
-      setImporting(false)
     }
   }
 
@@ -146,7 +100,13 @@ export function SettingsPage() {
               </select>
             </label>
             <label>
-              {messages.lowStockDays}
+              <span className="settings-hint">
+                {messages.lowStockWarning}
+                <InfoTip
+                  label={messages.lowStockWarning}
+                  content={messages.lowStockInfo}
+                />
+              </span>
               <input
                 type="number"
                 min="0"
@@ -159,6 +119,59 @@ export function SettingsPage() {
                 }
               />
             </label>
+          </section>
+          <section className="panel form-grid goal-settings-section">
+            <h2>{messages.goalsSettings}</h2>
+            <label>
+              <span className="settings-hint">
+                {messages.goalWaterDays}
+                <InfoTip label={messages.goal} content={messages.goalInfo} />
+              </span>
+              <input
+                type="number"
+                min="1"
+                max="365"
+                step="1"
+                inputMode="numeric"
+                placeholder={messages.noGoalConfigured}
+                value={settings.goalWaterDays ?? ''}
+                onChange={(event) =>
+                  update({
+                    goalWaterDays:
+                      event.target.value === ''
+                        ? null
+                        : Number(event.target.value),
+                  })
+                }
+              />
+            </label>
+            <label>
+              <span className="settings-hint">
+                {messages.goalFoodDays}
+                <InfoTip label={messages.goal} content={messages.goalInfo} />
+              </span>
+              <input
+                type="number"
+                min="1"
+                max="365"
+                step="1"
+                inputMode="numeric"
+                placeholder={messages.noGoalConfigured}
+                value={settings.goalFoodDays ?? ''}
+                onChange={(event) =>
+                  update({
+                    goalFoodDays:
+                      event.target.value === ''
+                        ? null
+                        : Number(event.target.value),
+                  })
+                }
+              />
+            </label>
+            <p className="muted">{messages.goalFieldHint}</p>
+          </section>
+          <section className="panel form-grid">
+            <h2>{messages.timeZone}</h2>
             <label>
               {messages.timeZone}
               <input
@@ -181,46 +194,7 @@ export function SettingsPage() {
               {messages.save}
             </button>
           </section>
-          <section className="panel form-grid backup-panel">
-            <h2>{messages.about}</h2>
-            <button
-              className="button button-secondary"
-              type="button"
-              onClick={() => void downloadBackup()}
-            >
-              {messages.exportBackup}
-            </button>
-            <label>
-              {messages.importBackup}
-              <input
-                type="file"
-                accept="application/json,.json"
-                onChange={(event) =>
-                  void selectBackup(event.target.files?.[0] ?? null)
-                }
-                aria-label={messages.chooseBackup}
-              />
-            </label>
-            {backupCounts && (
-              <div>
-                <p>
-                  {messages.backupCounts
-                    .replace('{members}', String(backupCounts.members))
-                    .replace('{categories}', String(backupCounts.categories))
-                    .replace('{items}', String(backupCounts.items))
-                    .replace('{batches}', String(backupCounts.batches))}
-                </p>
-                <button
-                  className="button"
-                  type="button"
-                  onClick={() => void doImport()}
-                  disabled={importing}
-                >
-                  {importing ? messages.loading : messages.importBackup}
-                </button>
-              </div>
-            )}
-          </section>
+          <BackupPanel timeZone={settings.timeZone} />
         </>
       )}
     </>

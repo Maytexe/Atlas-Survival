@@ -1,45 +1,121 @@
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { ItemForm } from '@/components/ItemForm'
-import { ItemStatus } from '@/components/ItemStatus'
+import { InventoryGoalStrip } from '@/components/InventoryGoalStrip'
+import { InventoryItemList } from '@/components/InventoryItemList'
 import { PageHeading } from '@/components/PageHeading'
+import { SidePanel } from '@/components/SidePanel'
 import { StatusPanel } from '@/components/StatusPanel'
+import {
+  calculateAutonomy,
+  calculateExpiry,
+  calculateStockAvailability,
+} from '@/domain'
+import { effectiveDaily } from '@/domain/consumption'
+import { toItemSnapshots } from '@/domain/from-records'
+import { useGoals } from '@/hooks/use-goals'
 import { useLocalData } from '@/hooks/use-local-data'
 import { useSettings } from '@/hooks/use-settings'
 import { messages } from '@/i18n/pt-BR'
 import { getToday } from '@/services/clock'
-import { deleteInventoryItem } from '@/services/repositories'
+
+type InventoryFilter =
+  'todos' | 'vence-logo' | 'vencidos' | 'sem-estoque' | 'sem-consumo'
+type InventorySort = 'nome' | 'autonomia' | 'validade'
+
+const filters: Array<{ value: InventoryFilter; label: string }> = [
+  { value: 'todos', label: messages.filterAll },
+  { value: 'vence-logo', label: messages.filterExpiring },
+  { value: 'vencidos', label: messages.filterExpired },
+  { value: 'sem-estoque', label: messages.filterOutOfStock },
+  { value: 'sem-consumo', label: messages.noConsumptionFilter },
+]
 
 export function InventoryPage() {
   const { data, error, loading } = useLocalData()
   const { settings } = useSettings()
-  const today = getToday(new Date(), settings?.timeZone)
+  const { goalFoodDays, goalWaterDays } = useGoals()
+  const [formOpen, setFormOpen] = useState(false)
+  const [createdItemId, setCreatedItemId] = useState('')
   const [search, setSearch] = useState('')
   const [categoryId, setCategoryId] = useState('')
-  const [showForm, setShowForm] = useState(false)
-  const [actionError, setActionError] = useState('')
-  const items = useMemo(
-    () =>
-      (data?.items ?? []).filter(
-        (item) =>
-          item.name
-            .toLocaleLowerCase('pt-BR')
-            .includes(search.toLocaleLowerCase('pt-BR')) &&
-          (!categoryId || item.category_id === categoryId),
-      ),
-    [categoryId, data?.items, search],
+  const [sort, setSort] = useState<InventorySort>('nome')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const today = getToday(new Date(), settings?.timeZone)
+  const snapshots = useMemo(
+    () => (data ? toItemSnapshots(data.items, data.batches, data.members) : []),
+    [data],
   )
+  const snapshotById = useMemo(
+    () => new Map(snapshots.map((snapshot) => [snapshot.id, snapshot])),
+    [snapshots],
+  )
+  const filterValue = searchParams.get('filtro')
+  const filter = filters.some((option) => option.value === filterValue)
+    ? (filterValue as InventoryFilter)
+    : 'todos'
+  const items = useMemo(() => {
+    const query = search.toLocaleLowerCase('pt-BR')
+    return (data?.items ?? [])
+      .filter((item) => {
+        const snapshot = snapshotById.get(item.id)
+        if (
+          !item.name.toLocaleLowerCase('pt-BR').includes(query) ||
+          (categoryId && item.category_id !== categoryId)
+        ) {
+          return false
+        }
+        const batches = snapshot?.batches ?? []
+        const available = calculateStockAvailability(batches, today).available
+        if (filter === 'vence-logo') {
+          return batches.some(
+            (batch) =>
+              batch.expirationDate !== null &&
+              calculateExpiry(batch.expirationDate, today).expiring_soon &&
+              !calculateExpiry(batch.expirationDate, today).expired,
+          )
+        }
+        if (filter === 'vencidos') {
+          return batches.some(
+            (batch) =>
+              batch.expirationDate !== null &&
+              calculateExpiry(batch.expirationDate, today).expired &&
+              batch.quantity.greaterThan(0),
+          )
+        }
+        if (filter === 'sem-estoque') return available.isZero()
+        if (filter === 'sem-consumo') {
+          return !snapshot || !effectiveDaily(snapshot).greaterThan(0)
+        }
+        return true
+      })
+      .sort((first, second) => {
+        const firstSnapshot = snapshotById.get(first.id)
+        const secondSnapshot = snapshotById.get(second.id)
+        if (sort === 'nome') {
+          return first.name.localeCompare(second.name, 'pt-BR')
+        }
+        if (sort === 'autonomia') {
+          const firstDays = firstSnapshot
+            ? calculateAutonomy(firstSnapshot, today)
+            : null
+          const secondDays = secondSnapshot
+            ? calculateAutonomy(secondSnapshot, today)
+            : null
+          return (firstDays ?? Infinity) - (secondDays ?? Infinity)
+        }
+        const firstDate =
+          firstSnapshot?.batches.find((batch) => batch.expirationDate !== null)
+            ?.expirationDate ?? '9999-12-31'
+        const secondDate =
+          secondSnapshot?.batches.find((batch) => batch.expirationDate !== null)
+            ?.expirationDate ?? '9999-12-31'
+        return firstDate.localeCompare(secondDate)
+      })
+  }, [categoryId, data?.items, filter, search, snapshotById, sort, today])
 
-  const remove = async (id: string) => {
-    if (!window.confirm(messages.confirmDelete)) return
-    try {
-      await deleteInventoryItem(id)
-      setActionError('')
-    } catch (cause) {
-      setActionError(
-        cause instanceof Error ? cause.message : messages.unknownError,
-      )
-    }
+  const changeFilter = (value: InventoryFilter) => {
+    setSearchParams(value === 'todos' ? {} : { filtro: value })
   }
 
   return (
@@ -50,40 +126,37 @@ export function InventoryPage() {
           <button
             className="button"
             type="button"
-            onClick={() => setShowForm((value) => !value)}
+            onClick={() => setFormOpen(true)}
           >
             {messages.addItem}
           </button>
         }
       />
-      {showForm && data && (
-        <section className="panel form-panel">
-          {data.categories.length ? (
-            <ItemForm
-              categories={data.categories}
-              onSaved={() => setShowForm(false)}
-              onCancel={() => setShowForm(false)}
-            />
-          ) : (
-            <p>{messages.addFirstCategory}</p>
-          )}
-        </section>
-      )}
-      {actionError && (
-        <p className="notice notice-error" role="alert">
-          {actionError}
+      <InventoryGoalStrip
+        snapshots={snapshots}
+        today={today}
+        goalFoodDays={goalFoodDays}
+        goalWaterDays={goalWaterDays}
+      />
+      {createdItemId && (
+        <p className="notice notice-info" role="status">
+          {messages.itemCreatedAddStock}{' '}
+          <Link to={`/estoque/${createdItemId}?adicionar=estoque`}>
+            {messages.addStock}
+          </Link>
         </p>
       )}
       <div className="filter-row">
-        <label className="search-field">
-          {messages.inventorySearch}
+        <label>
+          {messages.searchInventory}
           <input
+            type="search"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
           />
         </label>
         <label>
-          {messages.filterByCategory}
+          {messages.filterCategory}
           <select
             value={categoryId}
             onChange={(event) => setCategoryId(event.target.value)}
@@ -96,6 +169,30 @@ export function InventoryPage() {
             ))}
           </select>
         </label>
+        <label>
+          {messages.sortBy}
+          <select
+            value={sort}
+            onChange={(event) => setSort(event.target.value as InventorySort)}
+          >
+            <option value="nome">{messages.sortName}</option>
+            <option value="autonomia">{messages.sortAutonomy}</option>
+            <option value="validade">{messages.sortExpiration}</option>
+          </select>
+        </label>
+      </div>
+      <div className="quick-filters" aria-label={messages.inventoryTitle}>
+        {filters.map((option) => (
+          <button
+            className="filter-chip"
+            type="button"
+            key={option.value}
+            aria-pressed={filter === option.value}
+            onClick={() => changeFilter(option.value)}
+          >
+            {option.label}
+          </button>
+        ))}
       </div>
       <StatusPanel
         loading={loading}
@@ -105,53 +202,40 @@ export function InventoryPage() {
           data?.items.length ? messages.noItemsMatch : messages.noItems
         }
       >
-        <section
-          className="panel inventory-list"
-          aria-label={messages.inventoryTitle}
-        >
-          {items.map((item) => {
-            const batches =
-              data?.batches.filter(
-                (batch) => batch.inventory_item_id === item.id,
-              ) ?? []
-            const categoryName =
-              data?.categories.find(
-                (category) => category.id === item.category_id,
-              )?.name ?? ''
-            return (
-              <article className="inventory-row" key={item.id}>
-                <div className="inventory-row-main">
-                  <Link
-                    className="inventory-item-name"
-                    to={`/estoque/${item.id}`}
-                  >
-                    {item.name}
-                  </Link>
-                  <span className="muted">
-                    {categoryName} · {item.unit}
-                  </span>
-                  <ItemStatus batches={batches} today={today} />
-                </div>
-                <div className="row-actions">
-                  <Link
-                    className="button button-secondary button-small"
-                    to={`/estoque/${item.id}`}
-                  >
-                    {messages.edit}
-                  </Link>
-                  <button
-                    className="button button-danger button-small"
-                    type="button"
-                    onClick={() => void remove(item.id)}
-                  >
-                    {messages.delete}
-                  </button>
-                </div>
-              </article>
-            )
-          })}
-        </section>
+        {data && (
+          <InventoryItemList
+            items={items}
+            categories={data.categories}
+            snapshots={snapshotById}
+            today={today}
+            timeZone={settings?.timeZone ?? 'America/Sao_Paulo'}
+          />
+        )}
       </StatusPanel>
+      {formOpen && (
+        <SidePanel title={messages.addItem} onClose={() => setFormOpen(false)}>
+          {data?.categories.length ? (
+            <ItemForm
+              categories={data.categories}
+              personCount={
+                data.members.filter((member) => member.member_type === 'PERSON')
+                  .length
+              }
+              animalCount={
+                data.members.filter((member) => member.member_type === 'ANIMAL')
+                  .length
+              }
+              onSaved={(id) => {
+                setFormOpen(false)
+                setCreatedItemId(id ?? '')
+              }}
+              onCancel={() => setFormOpen(false)}
+            />
+          ) : (
+            <p>{messages.addFirstCategory}</p>
+          )}
+        </SidePanel>
+      )}
     </>
   )
 }

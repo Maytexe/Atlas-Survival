@@ -56,6 +56,8 @@ def aggregate_autonomy(
             "item_kind": item_kind.value,
             "dimension": dimension,
             "days": aggregate_days,
+            "available_base": available_base,
+            "daily_base": effective_daily_base,
             "coverage_count": len(consuming_items),
             "total_items": len(group_items),
             "coverage_label": (f"calculado com {len(consuming_items)} de {len(group_items)} itens"),

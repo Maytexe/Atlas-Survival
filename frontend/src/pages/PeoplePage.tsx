@@ -1,9 +1,12 @@
 import { useState } from 'react'
+import { PawPrint, UserRound } from 'lucide-react'
 import { MemberForm } from '@/components/MemberForm'
 import { PageHeading } from '@/components/PageHeading'
+import { SidePanel } from '@/components/SidePanel'
 import { StatusPanel } from '@/components/StatusPanel'
 import { useLocalData } from '@/hooks/use-local-data'
 import { messages } from '@/i18n/pt-BR'
+import { formatAge } from '@/services/format'
 import { deleteMember } from '@/services/repositories'
 import type { HouseholdMember } from '@/db'
 
@@ -42,8 +45,15 @@ export function PeoplePage() {
           </button>
         }
       />
+      <p className="muted people-note">{messages.peopleConsumptionNote}</p>
       {formOpen && (
-        <section className="panel form-panel">
+        <SidePanel
+          title={editing ? messages.editMemberTitle : messages.addMember}
+          onClose={() => {
+            setFormOpen(false)
+            setEditing(undefined)
+          }}
+        >
           <MemberForm
             {...(editing ? { member: editing } : {})}
             onSaved={() => {
@@ -55,7 +65,7 @@ export function PeoplePage() {
               setEditing(undefined)
             }}
           />
-        </section>
+        </SidePanel>
       )}
       {actionError && (
         <p className="notice notice-error" role="alert">
@@ -72,12 +82,19 @@ export function PeoplePage() {
           {data?.members.map((member) => (
             <article className="record-row" key={member.id}>
               <div>
-                <strong>{member.name}</strong>
+                <strong className="member-name">
+                  {member.member_type === 'PERSON' ? (
+                    <UserRound size={20} aria-hidden="true" />
+                  ) : (
+                    <PawPrint size={20} aria-hidden="true" />
+                  )}
+                  {member.name}
+                </strong>
                 <p className="muted">
                   {member.member_type === 'PERSON'
                     ? messages.person
                     : messages.animal}
-                  {member.age !== null ? ` · ${member.age}` : ''}
+                  {member.age !== null ? ` · ${formatAge(member.age)}` : ''}
                 </p>
                 {member.notes && <p>{member.notes}</p>}
               </div>

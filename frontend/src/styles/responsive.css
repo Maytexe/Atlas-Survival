@@ -3,12 +3,15 @@
     transform: translateX(-100%);
     transition: transform 0.2s ease;
   }
+
   .sidebar-open {
     transform: translateX(0);
   }
+
   .app-main {
     margin-left: 0;
   }
+
   .menu-toggle {
     position: fixed;
     z-index: 30;
@@ -16,6 +19,7 @@
     left: 0.7rem;
     display: inline-flex !important;
   }
+
   .drawer-backdrop {
     position: fixed;
     z-index: 15;
@@ -24,14 +28,16 @@
     border: 0;
     background: #0008;
   }
+
   .topbar {
     min-height: 72px;
-    justify-content: flex-end;
-    padding: 0.5rem 0.75rem 0.5rem 8.5rem;
+    padding: 0.5rem 1rem 0.5rem 5.2rem;
   }
+
   .page-content {
     padding: 1.25rem 1rem 2rem;
   }
+
   .global-notices {
     padding: 0.5rem 1rem 0;
   }
@@ -41,28 +47,106 @@
   .dashboard-sections {
     grid-template-columns: 1fr;
   }
+
   .panel-wide {
     grid-column: auto;
   }
+
   .page-heading,
   .section-heading,
   .record-row {
     align-items: stretch;
     flex-direction: column;
   }
+
   .inventory-row {
     align-items: stretch;
     flex-direction: column;
   }
+
   .filter-row {
     grid-template-columns: 1fr;
   }
+
   .page-heading .button {
     align-self: flex-start;
   }
+
+  .autonomy-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .autonomy-band {
+    min-height: 210px;
+  }
+
+  .autonomy-band-food {
+    min-height: 180px;
+  }
+
   .summary-grid {
+    display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .summary-card {
+    min-width: 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .summary-card + .summary-card {
+    border-left: 0;
+  }
+
+  .inventory-table-wrap {
+    display: none;
+  }
+
+  .inventory-mobile-list {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .detail-measures {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .inventory-goal-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .expiry-timeline li {
+    grid-template-columns: 1fr auto;
+  }
+
+  .timeline-date {
+    grid-column: 1 / -1;
+  }
+
+  .dashboard-alert {
+    grid-template-columns: auto 1fr;
+  }
+
+  .dashboard-alert .button {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .side-panel-scrim {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .side-panel {
+    width: 100%;
+    max-height: 92vh;
+    border-radius: var(--radius-large) var(--radius-large) 0 0;
+  }
+
   .sync-detail,
   .sync-time {
     font-size: 0.7rem;

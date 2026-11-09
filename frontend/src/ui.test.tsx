@@ -9,6 +9,7 @@ import { ConsumptionActions } from '@/components/ConsumptionActions'
 import { SettingsPage } from '@/pages/SettingsPage'
 import { messages } from '@/i18n/pt-BR'
 import { useSyncStore } from '@/store/sync-store'
+import { validateBackup } from '@/services/backup'
 
 const mocks = vi.hoisted(() => ({
   createBatch: vi.fn(),
@@ -41,6 +42,25 @@ describe('interface da etapa 5', () => {
     vi.clearAllMocks()
     mocks.createBatch.mockResolvedValue(batch)
     mocks.adjustBatchQuantity.mockResolvedValue(undefined)
+  })
+
+  it('preenche a validade pelo atalho de três meses', async () => {
+    const user = userEvent.setup()
+    render(
+      <BatchForm
+        inventoryItemId="item-1"
+        today="2026-11-08"
+        onSaved={vi.fn()}
+        onCancel={vi.fn()}
+      />,
+    )
+    await user.click(
+      screen.getByRole('button', { name: messages.expiryPlus3Months }),
+    )
+    expect(
+      (screen.getByLabelText(messages.expirationDate) as HTMLInputElement)
+        .value,
+    ).toBe('2027-02-08')
   })
 
   it('salva lote com quantidade decimal usando vírgula e validade', async () => {
@@ -91,7 +111,14 @@ describe('interface da etapa 5', () => {
   it('permite desfazer um consumo registrado como ADJUST compensatório', async () => {
     const user = userEvent.setup()
     render(<ConsumptionActions batch={batch} onError={vi.fn()} />)
-    await user.click(screen.getByRole('button', { name: messages.consumeOne }))
+    await user.click(
+      screen.getByRole('button', {
+        name: messages.consumeOne.replace(
+          '{quantity}',
+          `1 ${messages.countUnit}`,
+        ),
+      }),
+    )
     await user.click(await screen.findByRole('button', { name: messages.undo }))
 
     await waitFor(() => {
@@ -142,7 +169,7 @@ describe('interface da etapa 5', () => {
 
   it('informa quando o backup selecionado é inválido', async () => {
     render(<SettingsPage />)
-    await screen.findByLabelText(messages.lowStockDays)
+    await screen.findByLabelText(messages.lowStockWarning)
 
     const file = new File(['not-json'], 'backup.json', {
       type: 'application/json',
@@ -154,5 +181,23 @@ describe('interface da etapa 5', () => {
     expect((await screen.findByRole('alert')).textContent).toContain(
       messages.invalidBackup,
     )
+  })
+
+  it('mantém backups antigos sem metas válidos', () => {
+    const backup = validateBackup({
+      version: 1,
+      exported_at: '2026-01-15T12:00:00Z',
+      household_members: [],
+      categories: [],
+      inventory_items: [],
+      stock_batches: [],
+    })
+    expect(backup.goals).toBeUndefined()
+  })
+
+  it('exibe os dois campos opcionais de meta nas configurações', async () => {
+    render(<SettingsPage />)
+    expect(await screen.findByLabelText(messages.goalFoodDays)).toBeTruthy()
+    expect(screen.getByLabelText(messages.goalWaterDays)).toBeTruthy()
   })
 })

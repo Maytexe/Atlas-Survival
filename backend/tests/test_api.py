@@ -106,6 +106,76 @@ async def test_invalid_batch_quantity_returns_problem_details(api_app: FastAPI) 
 
 
 @pytest.mark.anyio
+async def test_goal_query_parameters_are_validated_and_dashboard_contract_is_optional(
+    api_app: FastAPI,
+) -> None:
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=api_app),
+        base_url="http://test",
+    ) as client:
+        without_goal = await client.get("/api/dashboard")
+        with_goal = await client.get(
+            "/api/dashboard",
+            params={"goal_food_days": 3},
+        )
+        invalid_dashboard = await client.get(
+            "/api/dashboard",
+            params={"goal_water_days": 0},
+        )
+        invalid_alerts = await client.get(
+            "/api/alerts",
+            params={"goal_food_days": 366},
+        )
+
+    assert without_goal.status_code == 200
+    assert "goals" not in without_goal.json()
+    assert with_goal.status_code == 200
+    assert with_goal.json()["goals"] == []
+    assert invalid_dashboard.status_code == 422
+    assert invalid_alerts.status_code == 422
+
+
+@pytest.mark.anyio
+async def test_goal_dashboard_and_below_goal_alert(api_app: FastAPI) -> None:
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=api_app),
+        base_url="http://test",
+    ) as client:
+        category_id = await _create_category(client, "Categoria meta")
+        item_id = await _create_item(client, category_id, name="Arroz meta")
+        await client.post(
+            f"/api/inventory/{item_id}/batches",
+            json={"quantity": "1.000"},
+        )
+        dashboard = await client.get(
+            "/api/dashboard",
+            params={"goal_food_days": 3},
+        )
+        alerts = await client.get(
+            "/api/alerts",
+            params={"goal_food_days": 3},
+        )
+
+    goal = dashboard.json()["goals"][0]
+    assert goal == {
+        "item_kind": "FOOD",
+        "dimension": "MASS",
+        "base_unit": "g",
+        "goal_days": 3,
+        "status": "BELOW",
+        "available_base": "1000.000",
+        "daily_base": "1250.000",
+        "needed_base": "3750.000",
+        "missing_base": "2750",
+        "partial_coverage": False,
+        "coverage_count": 1,
+        "total_items": 1,
+    }
+    below_goal = next(alert for alert in alerts.json() if alert["type"] == "BELOW_GOAL")
+    assert below_goal["message"] == "Faltam 2750 g para 3 dias."
+
+
+@pytest.mark.anyio
 async def test_batch_for_missing_item_returns_problem_404(api_app: FastAPI) -> None:
     async with httpx.AsyncClient(
         transport=httpx.ASGITransport(app=api_app),

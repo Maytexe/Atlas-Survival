@@ -1,8 +1,14 @@
+import { useEffect } from 'react'
+import { Apple, Droplet, Package } from 'lucide-react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import Decimal from 'decimal.js'
+import { useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import type { Category, InventoryItem } from '@/db'
+import { effectiveDaily } from '@/domain/consumption'
+import type { ItemKind, Unit } from '@/domain/types'
 import { messages } from '@/i18n/pt-BR'
+import { formatPlural, formatQuantity } from '@/services/format'
 import {
   createInventoryItem,
   updateInventoryItem,
@@ -27,20 +33,32 @@ interface ItemFormProps {
   categories: Category[]
   item?: InventoryItem
   initialCategoryId?: string
-  onSaved: () => void
+  personCount?: number
+  animalCount?: number
+  onSaved: (itemId?: string) => void
   onCancel: () => void
+}
+
+const unitsByKind: Record<ItemKind, readonly Unit[]> = {
+  FOOD: ['kg', 'g', 'pacote', 'lata'],
+  WATER: ['L', 'ml', 'garrafa'],
+  OTHER: ['kg', 'g', 'L', 'ml', 'unidade', 'pacote', 'lata', 'garrafa'],
 }
 
 export function ItemForm({
   categories,
   item,
   initialCategoryId,
+  personCount = 0,
+  animalCount = 0,
   onSaved,
   onCancel,
 }: ItemFormProps) {
   const {
     register,
     handleSubmit,
+    control,
+    setValue,
     formState: { errors, isSubmitting },
     setError,
   } = useForm<FormValues>({
@@ -50,11 +68,75 @@ export function ItemForm({
       description: item?.description ?? '',
       category_id: item?.category_id ?? initialCategoryId ?? '',
       item_kind: item?.item_kind ?? 'FOOD',
-      unit: item?.unit ?? 'unidade',
+      unit: item?.unit ?? 'kg',
       daily_consumption: item?.daily_consumption ?? '',
       consumption_basis: item?.consumption_basis ?? 'HOUSEHOLD',
     },
   })
+
+  const itemKind = useWatch({ control, name: 'item_kind' })
+  const unit = useWatch({ control, name: 'unit' })
+  const dailyConsumption = useWatch({ control, name: 'daily_consumption' })
+  const consumptionBasis = useWatch({ control, name: 'consumption_basis' })
+  const allowedUnits = unitsByKind[itemKind]
+
+  useEffect(() => {
+    if (!allowedUnits.includes(unit)) {
+      setValue('unit', allowedUnits[0] ?? 'unidade', { shouldValidate: true })
+    }
+  }, [allowedUnits, setValue, unit])
+
+  const preview = (() => {
+    if (!dailyConsumption.trim()) return null
+    const normalized = dailyConsumption.replace(',', '.')
+    if (!/^\d+(?:\.\d{1,3})?$/.test(normalized)) return null
+    const daily = effectiveDaily({
+      id: item?.id ?? 'preview',
+      name: item?.name ?? '',
+      itemKind,
+      unit,
+      dailyConsumption: new Decimal(normalized),
+      consumptionBasis,
+      personCount,
+      animalCount,
+      batches: [],
+    })
+    return daily.greaterThan(0) ? formatQuantity(daily, unit) : null
+  })()
+
+  const basisLabel = {
+    HOUSEHOLD: messages.household,
+    PER_PERSON: messages.eachPerson,
+    PER_ANIMAL: messages.eachAnimal,
+  }[consumptionBasis]
+  const previewLabel =
+    consumptionBasis === 'HOUSEHOLD'
+      ? messages.consumptionHouseholdPreview.replace(
+          '{quantity}',
+          preview ?? '',
+        )
+      : messages.consumptionPreview
+          .replace(
+            '{count}',
+            String(
+              consumptionBasis === 'PER_PERSON' ? personCount : animalCount,
+            ),
+          )
+          .replace(
+            '{members}',
+            consumptionBasis === 'PER_PERSON'
+              ? formatPlural(
+                  personCount,
+                  messages.housePerson,
+                  messages.housePeople,
+                ).replace(/^\d+ /, '')
+              : formatPlural(
+                  animalCount,
+                  messages.houseAnimal,
+                  messages.houseAnimals,
+                ).replace(/^\d+ /, ''),
+          )
+          .replace('{quantity}', preview ?? '')
 
   const submit = handleSubmit(async (values) => {
     try {
@@ -70,15 +152,25 @@ export function ItemForm({
         daily_consumption: consumption,
         consumption_basis: values.consumption_basis,
       }
-      if (item) await updateInventoryItem(item.id, payload)
-      else await createInventoryItem(payload)
-      onSaved()
+      if (item) {
+        await updateInventoryItem(item.id, payload)
+        onSaved(item.id)
+      } else {
+        const created = await createInventoryItem(payload)
+        onSaved(created.id)
+      }
     } catch (error) {
       setError('root', {
         message: error instanceof Error ? error.message : messages.unknownError,
       })
     }
   })
+
+  const kindOptions = [
+    { value: 'FOOD', label: messages.itemKindFoodCard, Icon: Apple },
+    { value: 'WATER', label: messages.itemKindWaterCard, Icon: Droplet },
+    { value: 'OTHER', label: messages.itemKindOtherCard, Icon: Package },
+  ] as const
 
   return (
     <form
@@ -93,6 +185,16 @@ export function ItemForm({
           <span className="field-error">{errors.name.message}</span>
         )}
       </label>
+      <fieldset className="item-kind-cards">
+        <legend>{messages.itemKindAccessible}</legend>
+        {kindOptions.map(({ value, label, Icon }) => (
+          <label className="item-kind-card" key={value}>
+            <input type="radio" value={value} {...register('item_kind')} />
+            <Icon size={22} aria-hidden="true" />
+            <span>{label}</span>
+          </label>
+        ))}
+      </fieldset>
       <label>
         {messages.description}
         <textarea {...register('description')} rows={2} />
@@ -113,50 +215,55 @@ export function ItemForm({
       </label>
       <div className="form-row">
         <label>
-          {messages.itemKind}
-          <select {...register('item_kind')}>
-            <option value="FOOD">{messages.foodAvailability}</option>
-            <option value="WATER">{messages.waterAvailability}</option>
-            <option value="OTHER">{messages.inventory}</option>
+          {messages.unit}
+          <select {...register('unit')}>
+            {allowedUnits.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
           </select>
         </label>
         <label>
-          {messages.unit}
-          <select {...register('unit')}>
-            {['kg', 'g', 'L', 'ml', 'unidade', 'pacote', 'lata', 'garrafa'].map(
-              (unit) => (
-                <option key={unit} value={unit}>
-                  {unit}
-                </option>
-              ),
-            )}
+          {messages.consumptionBasis}
+          <select {...register('consumption_basis')}>
+            <option value="HOUSEHOLD">{messages.household}</option>
+            <option value="PER_PERSON">{messages.eachPerson}</option>
+            <option value="PER_ANIMAL">{messages.eachAnimal}</option>
           </select>
         </label>
       </div>
-      <div className="form-row">
-        <label>
-          {messages.dailyConsumption}
+      <label>
+        {messages.householdDailyConsumption}
+        <span className="consumption-sentence">
+          {consumptionBasis === 'HOUSEHOLD'
+            ? messages.consumptionHouseholdSentence
+            : messages.consumptionSentence.replace('{basis}', basisLabel)}
+        </span>
+        <span className="input-with-suffix">
           <input
             {...register('daily_consumption')}
             inputMode="decimal"
             type="text"
             placeholder={messages.optional}
           />
-          {errors.daily_consumption && (
-            <span className="field-error">
-              {errors.daily_consumption.message}
-            </span>
+          <span>{unit}</span>
+        </span>
+        {errors.daily_consumption && (
+          <span className="field-error">
+            {errors.daily_consumption.message}
+          </span>
+        )}
+      </label>
+      {dailyConsumption.trim() && (
+        <div className="form-preview" aria-live="polite">
+          {preview ? (
+            <p>{previewLabel}</p>
+          ) : (
+            <p>{messages.consumptionNoMembers}</p>
           )}
-        </label>
-        <label>
-          {messages.consumptionBasis}
-          <select {...register('consumption_basis')}>
-            <option value="HOUSEHOLD">{messages.dashboardPeople}</option>
-            <option value="PER_PERSON">{messages.person}</option>
-            <option value="PER_ANIMAL">{messages.animal}</option>
-          </select>
-        </label>
-      </div>
+        </div>
+      )}
       {errors.root && (
         <p className="notice notice-error" role="alert">
           {errors.root.message}

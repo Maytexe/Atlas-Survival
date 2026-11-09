@@ -72,6 +72,8 @@ export function aggregateAutonomy(
         .dividedBy(dailyBase)
         .toDecimalPlaces(0, Decimal.ROUND_FLOOR)
         .toNumber(),
+      available_base: availableBase,
+      daily_base: dailyBase,
       coverage_count: consumingItems.length,
       total_items: groupItems.length,
       coverage_label: `calculado com ${consumingItems.length} de ${groupItems.length} itens`,

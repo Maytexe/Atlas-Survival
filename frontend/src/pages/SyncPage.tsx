@@ -5,6 +5,28 @@ import { useOutbox } from '@/hooks/use-outbox'
 import { useSyncStatus } from '@/hooks/useSyncStatus'
 import { messages } from '@/i18n/pt-BR'
 import { syncEngine } from '@/services/sync/instance'
+import type { MutationOperation, EntityName } from '@/db'
+
+const stateLabels = {
+  Online: messages.syncOnline,
+  Offline: messages.syncOffline,
+  Sincronizando: messages.syncRunning,
+  Erro: messages.syncFailed,
+} as const
+
+const entityLabels: Record<EntityName, string> = {
+  household_members: messages.people,
+  categories: messages.categories,
+  inventory_items: messages.inventory,
+  stock_batches: messages.batches,
+}
+
+const operationLabels: Record<MutationOperation, string> = {
+  CREATE: messages.operationCreate,
+  UPDATE: messages.operationUpdate,
+  DELETE: messages.operationDelete,
+  ADJUST: messages.operationAdjust,
+}
 
 export function SyncPage() {
   const { entries, error, loading } = useOutbox()
@@ -80,7 +102,7 @@ export function SyncPage() {
         }
       />
       <p className="muted">
-        {state} · {pendingCount} {messages.pendingCount}
+        {stateLabels[state]} · {pendingCount} {messages.pendingCount}
       </p>
       {actionError && (
         <p className="notice notice-error" role="alert">
@@ -105,13 +127,9 @@ export function SyncPage() {
           <ul className="mutation-list">
             {pending.map((entry) => (
               <li key={entry.id}>
-                <span>
-                  {entry.op} · {entry.entity}
-                </span>
-                <code>{entry.entity_id}</code>
-                <span className="muted">
-                  {entry.attempts} {messages.attempts}
-                </span>
+                <strong>
+                  {operationLabels[entry.op]} · {entityLabels[entry.entity]}
+                </strong>
               </li>
             ))}
           </ul>
@@ -132,9 +150,8 @@ export function SyncPage() {
               <li className="mutation-error" key={entry.id}>
                 <div>
                   <strong>
-                    {entry.op} · {entry.entity}
+                    {operationLabels[entry.op]} · {entityLabels[entry.entity]}
                   </strong>
-                  <code>{entry.entity_id}</code>
                   <p role="alert">
                     {entry.status === 'blocked'
                       ? messages.mutationBlocked

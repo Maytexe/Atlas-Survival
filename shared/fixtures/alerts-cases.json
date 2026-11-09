@@ -3,6 +3,8 @@
     "name": "alertas abrangem validade estoque e consumo",
     "today": "2026-01-15",
     "low_stock_days": 7,
+    "goal_food_days": 1,
+    "goal_water_days": 1,
     "members": [],
     "items": [
       {
@@ -89,6 +91,13 @@
         "item_id": "comida",
         "batch_id": "vence-em-30",
         "date": "2026-02-14"
+      },
+      {
+        "type": "BELOW_GOAL",
+        "severity": "WARNING",
+        "item_id": "agua",
+        "batch_id": null,
+        "date": null
       },
       {
         "type": "LOW_STOCK",

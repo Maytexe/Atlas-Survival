@@ -6,6 +6,7 @@ from app.domain.autonomy import calculate_autonomy
 from app.domain.availability import calculate_stock_availability
 from app.domain.consumption import effective_daily
 from app.domain.expiry import calculate_expiry
+from app.domain.goals import evaluate_goals
 from app.domain.types import ItemSnapshot
 
 _ZERO = Decimal("0")
@@ -25,6 +26,8 @@ def calculate_alerts(
     items: tuple[ItemSnapshot, ...],
     today: date,
     low_stock_days: int,
+    goal_food_days: int | None = None,
+    goal_water_days: int | None = None,
 ) -> list[Alert]:
     alerts: list[Alert] = []
     for item in items:
@@ -88,6 +91,23 @@ def calculate_alerts(
                     "date": None,
                 }
             )
+    for goal in evaluate_goals(
+        items=items,
+        today=today,
+        goal_food_days=goal_food_days,
+        goal_water_days=goal_water_days,
+    ):
+        if goal["status"] == "BELOW" and goal["limiting_item"] is not None:
+            alerts.append(
+                {
+                    "type": "BELOW_GOAL",
+                    "severity": "WARNING",
+                    "item_id": goal["limiting_item"],
+                    "batch_id": None,
+                    "date": None,
+                }
+            )
+
     alerts.sort(
         key=lambda alert: (
             _SEVERITY_ORDER[alert["severity"]],

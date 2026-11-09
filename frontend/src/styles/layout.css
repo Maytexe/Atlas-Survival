@@ -1,6 +1,7 @@
 .app-shell {
   min-height: 100vh;
 }
+
 .sidebar {
   position: fixed;
   z-index: 20;
@@ -10,8 +11,9 @@
   flex-direction: column;
   padding: 1.25rem 1rem;
   color: #f6f7f2;
-  background: #25372a;
+  background: var(--color-sidebar);
 }
+
 .brand {
   display: flex;
   gap: 0.75rem;
@@ -20,51 +22,66 @@
   color: inherit;
   text-decoration: none;
 }
+
 .brand-mark {
   display: grid;
   width: 42px;
   height: 42px;
   place-items: center;
-  border-radius: 12px;
-  background: #477754;
+  border: 1px solid #6c9ca1;
+  border-radius: var(--radius-large);
+  color: #fff;
+  background: var(--color-accent);
   font-weight: 800;
 }
+
 .brand small {
   display: block;
   max-width: 175px;
   margin-top: 0.2rem;
-  color: #d4dfd4;
+  color: #d7e5e5;
   font-size: 0.75rem;
 }
+
 .main-navigation {
   display: grid;
   gap: 0.35rem;
   margin-top: 2rem;
 }
+
 .navigation-link {
   display: flex;
   min-height: 48px;
   align-items: center;
+  gap: 0.7rem;
   padding: 0.7rem 0.8rem;
-  border-radius: 8px;
-  color: #e4ebe3;
+  border-radius: var(--radius-medium);
+  color: #e4eeee;
   text-decoration: none;
 }
+
 .navigation-link:hover,
 .navigation-link-active {
   color: #fff;
-  background: #3a5940;
+  background: var(--color-sidebar-hover);
 }
+
+.navigation-link-active {
+  box-shadow: inset 3px 0 #f1be72;
+}
+
 .sidebar-footer {
   margin-top: auto;
   padding: 0.75rem 0.5rem;
-  color: #d4dfd4;
+  color: #d4dfdf;
   font-size: 0.8rem;
 }
+
 .app-main {
   min-height: 100vh;
   margin-left: 260px;
 }
+
 .topbar {
   position: sticky;
   z-index: 10;
@@ -77,22 +94,24 @@
   border-bottom: 1px solid var(--color-border);
   background: var(--color-panel);
 }
+
 .page-content {
-  width: min(1120px, 100%);
+  width: min(1240px, 100%);
   margin: 0 auto;
   padding: 1.5rem 2rem 3rem;
 }
+
 .global-notices {
   display: grid;
   gap: 0.5rem;
   padding: 0.5rem 2rem 0;
 }
-.menu-toggle {
-  display: none !important;
-}
+
+.menu-toggle,
 .drawer-backdrop {
   display: none;
 }
+
 .page-heading,
 .section-heading {
   display: flex;
@@ -100,23 +119,29 @@
   align-items: center;
   gap: 1rem;
 }
+
 .page-heading {
   margin-bottom: 1.25rem;
 }
+
 .page-heading h1 {
   margin-bottom: 0.3rem;
 }
+
 .page-heading p {
   margin-bottom: 0;
   color: var(--color-muted);
 }
+
 .panel,
-.summary-card {
+.summary-card,
+.autonomy-band {
   padding: 1.15rem;
   border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: var(--radius-large);
   background: var(--color-panel);
 }
+
 .dashboard-content,
 .dashboard-sections,
 .record-list,
@@ -125,25 +150,73 @@
   display: grid;
   gap: 1rem;
 }
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-.summary-card {
-  display: grid;
-  gap: 0.65rem;
-}
-.summary-card strong {
-  font-size: 1.5rem;
-}
-.summary-card-warning {
-  border-left: 4px solid var(--color-warning);
-}
+
 .dashboard-sections {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
+
 .panel-wide {
   grid-column: 1 / -1;
+}
+
+.summary-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 0 0 1.25rem;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.summary-card {
+  display: grid;
+  min-width: 120px;
+  flex: 1;
+  gap: 0.2rem;
+  padding: 0.8rem 1rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.summary-card + .summary-card {
+  border-left: 1px solid var(--color-border);
+}
+
+.summary-card strong {
+  font-size: 1.45rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.summary-card-warning strong {
+  color: var(--color-warning);
+}
+
+.record-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.record-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.25rem 0 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.record-row:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.record-row p {
+  margin: 0.35rem 0 0;
+}
+
+.section-title-with-info {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
 }

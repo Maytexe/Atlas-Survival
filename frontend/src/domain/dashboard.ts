@@ -2,12 +2,15 @@ import Decimal from 'decimal.js'
 import { aggregateAutonomy } from './autonomy'
 import { calculateStockAvailability } from './availability'
 import { calculateExpiry } from './expiry'
+import { calculateGoals } from './goals'
 import { calculateUnitBase, unitDefinitions } from './units'
 import type { DashboardResult, ItemSnapshot } from './types'
 
 export function calculateDashboard(
   items: readonly ItemSnapshot[],
   today: string,
+  goalFoodDays: number | null = null,
+  goalWaterDays: number | null = null,
 ): DashboardResult {
   const availability: DashboardResult['availability'] = {}
   let expiredBatches = 0
@@ -40,5 +43,6 @@ export function calculateDashboard(
     expired_batches: expiredBatches,
     expiring_soon_batches: expiringSoonBatches,
     autonomy: aggregateAutonomy(items, today),
+    goals: calculateGoals(items, today, goalFoodDays, goalWaterDays),
   }
 }

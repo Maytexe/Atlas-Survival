@@ -1,5 +1,16 @@
 import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
+import {
+  Bell,
+  Boxes,
+  ClipboardList,
+  LayoutDashboard,
+  Menu,
+  Settings,
+  Tags,
+  Users,
+  X,
+} from 'lucide-react'
 import { messages } from '@/i18n/pt-BR'
 import { FirstSyncNotice } from './FirstSyncNotice'
 import { PwaUpdateNotice } from './PwaUpdateNotice'
@@ -7,14 +18,18 @@ import { StorageNotice } from './StorageNotice'
 import { SyncBadge } from './SyncBadge'
 
 const navigation = [
-  ['/', messages.dashboard],
-  ['/estoque', messages.inventory],
-  ['/pessoas', messages.people],
-  ['/categorias', messages.categories],
-  ['/alertas', messages.alerts],
-  ['/sincronizacao', messages.synchronization],
-  ['/configuracoes', messages.settings],
-  ['/ficha', messages.emergencySheet],
+  { to: '/', label: messages.dashboard, Icon: LayoutDashboard },
+  { to: '/estoque', label: messages.inventory, Icon: Boxes },
+  { to: '/pessoas', label: messages.people, Icon: Users },
+  { to: '/categorias', label: messages.categories, Icon: Tags },
+  { to: '/alertas', label: messages.alerts, Icon: Bell },
+  {
+    to: '/sincronizacao',
+    label: messages.synchronization,
+    Icon: ClipboardList,
+  },
+  { to: '/configuracoes', label: messages.settings, Icon: Settings },
+  { to: '/ficha', label: messages.emergencySheet, Icon: ClipboardList },
 ] as const
 
 export function AppLayout() {
@@ -24,11 +39,12 @@ export function AppLayout() {
       <button
         className="menu-toggle button button-secondary"
         type="button"
+        aria-label={menuOpen ? messages.closeMenu : messages.openMenu}
         aria-expanded={menuOpen}
         aria-controls="primary-navigation"
         onClick={() => setMenuOpen((open) => !open)}
       >
-        {menuOpen ? messages.closeMenu : messages.openMenu}
+        {menuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
       </button>
       <aside
         id="primary-navigation"
@@ -45,7 +61,7 @@ export function AppLayout() {
           </span>
         </NavLink>
         <nav className="main-navigation" aria-label={messages.menuDescription}>
-          {navigation.map(([to, label]) => (
+          {navigation.map(({ to, label, Icon }) => (
             <NavLink
               key={to}
               to={to}
@@ -55,6 +71,7 @@ export function AppLayout() {
                 `navigation-link${isActive ? ' navigation-link-active' : ''}`
               }
             >
+              <Icon size={19} aria-hidden="true" />
               {label}
             </NavLink>
           ))}

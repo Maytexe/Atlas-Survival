@@ -8,6 +8,7 @@ import {
   calculateAutonomy,
   calculateDashboard,
   calculateExpiry,
+  calculateGoals,
   calculateStockAvailability,
   calculateUnitBase,
 } from './index'
@@ -142,9 +143,13 @@ describe('paridade com fixtures compartilhados', () => {
           ]),
         ),
       ).toEqual(testCase.expected.item_days)
-      expect(aggregateAutonomy(items, testCase.today)).toEqual(
-        testCase.expected.aggregates,
-      )
+      expect(
+        aggregateAutonomy(items, testCase.today).map((aggregate) => ({
+          ...aggregate,
+          available_base: aggregate.available_base.toString(),
+          daily_base: aggregate.daily_base.toString(),
+        })),
+      ).toEqual(testCase.expected.aggregates)
     }
   })
 
@@ -153,6 +158,8 @@ describe('paridade com fixtures compartilhados', () => {
       Array<{
         today: string
         low_stock_days: number
+        goal_food_days?: number | null
+        goal_water_days?: number | null
         items: FixtureItem[]
         expected: ReturnType<typeof calculateAlerts>
       }>
@@ -163,6 +170,8 @@ describe('paridade com fixtures compartilhados', () => {
           testCase.items.map(fromFixture),
           testCase.today,
           testCase.low_stock_days,
+          testCase.goal_food_days ?? null,
+          testCase.goal_water_days ?? null,
         ),
       ).toEqual(testCase.expected)
     }
@@ -198,7 +207,56 @@ describe('paridade com fixtures compartilhados', () => {
       expect(actual.expiring_soon_batches).toBe(
         testCase.expected.expiring_soon_batches,
       )
-      expect(actual.autonomy).toEqual(testCase.expected.autonomy)
+      expect(
+        actual.autonomy.map((aggregate) => ({
+          ...aggregate,
+          available_base: aggregate.available_base.toString(),
+          daily_base: aggregate.daily_base.toString(),
+        })),
+      ).toEqual(testCase.expected.autonomy)
+    }
+  })
+
+  it('calcula metas de autonomia pelos fixtures compartilhados', () => {
+    const cases = readFixture<
+      Array<{
+        today: string
+        goal_food_days: number | null
+        goal_water_days: number | null
+        items: FixtureItem[]
+        expected: Array<{
+          item_kind: string
+          dimension: string
+          base_unit: string
+          goal_days: number | null
+          status: string
+          available_base: string
+          daily_base: string
+          needed_base: string
+          missing_base: string
+          partial_coverage: boolean
+          coverage_count: number
+          total_items: number
+          limiting_item: string | null
+        }>
+      }>
+    >('goal-cases.json')
+    for (const testCase of cases) {
+      const actual = calculateGoals(
+        testCase.items.map(fromFixture),
+        testCase.today,
+        testCase.goal_food_days,
+        testCase.goal_water_days,
+      )
+      expect(
+        actual.map((goal) => ({
+          ...goal,
+          available_base: goal.available_base.toString(),
+          daily_base: goal.daily_base.toString(),
+          needed_base: goal.needed_base.toString(),
+          missing_base: goal.missing_base.toString(),
+        })),
+      ).toEqual(testCase.expected)
     }
   })
 })

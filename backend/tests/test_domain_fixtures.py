@@ -16,6 +16,7 @@ from app.domain import (
     calculate_unit_base,
 )
 from app.domain.enums import Unit
+from app.domain.goals import evaluate_goals
 
 FIXTURES = Path(__file__).resolve().parents[2] / "shared" / "fixtures"
 
@@ -25,6 +26,12 @@ def _read_fixture(name: str) -> list[dict[str, Any]]:
         list[dict[str, Any]],
         json.loads((FIXTURES / name).read_text(encoding="utf-8")),
     )
+
+
+def _decimal_string(value: object) -> str:
+    if not isinstance(value, Decimal):
+        raise TypeError("Esperava Decimal nos resultados do domínio.")
+    return format(value.normalize(), "f")
 
 
 def test_expiry_cases_match_shared_fixture() -> None:
@@ -79,7 +86,15 @@ def test_autonomy_cases_match_shared_fixture() -> None:
         assert {item["id"]: item["days"] for item in results} == case["expected"]["item_days"], (
             case["name"]
         )
-        assert aggregates == case["expected"]["aggregates"], case["name"]
+        normalized_aggregates = [
+            {
+                **aggregate,
+                "available_base": _decimal_string(aggregate["available_base"]),
+                "daily_base": _decimal_string(aggregate["daily_base"]),
+            }
+            for aggregate in aggregates
+        ]
+        assert normalized_aggregates == case["expected"]["aggregates"], case["name"]
 
 
 def test_alert_cases_match_shared_fixture() -> None:
@@ -88,6 +103,8 @@ def test_alert_cases_match_shared_fixture() -> None:
             items=tuple(from_fixture(item) for item in case["items"]),
             today=date.fromisoformat(case["today"]),
             low_stock_days=case["low_stock_days"],
+            goal_food_days=case.get("goal_food_days"),
+            goal_water_days=case.get("goal_water_days"),
         )
 
         assert alerts == case["expected"], case["name"]
@@ -107,4 +124,33 @@ def test_dashboard_cases_match_shared_fixture() -> None:
         assert result["availability"] == expected_availability, case["name"]
         assert result["expired_batches"] == expected["expired_batches"], case["name"]
         assert result["expiring_soon_batches"] == expected["expiring_soon_batches"], case["name"]
-        assert result["autonomy"] == expected["autonomy"], case["name"]
+        normalized_autonomy = [
+            {
+                **aggregate,
+                "available_base": _decimal_string(aggregate["available_base"]),
+                "daily_base": _decimal_string(aggregate["daily_base"]),
+            }
+            for aggregate in result["autonomy"]
+        ]
+        assert normalized_autonomy == expected["autonomy"], case["name"]
+
+
+def test_goal_cases_match_shared_fixture() -> None:
+    for case in _read_fixture("goal-cases.json"):
+        result = evaluate_goals(
+            items=tuple(from_fixture(item) for item in case["items"]),
+            today=date.fromisoformat(case["today"]),
+            goal_food_days=case["goal_food_days"],
+            goal_water_days=case["goal_water_days"],
+        )
+        normalized = [
+            {
+                **goal,
+                "available_base": _decimal_string(goal["available_base"]),
+                "daily_base": _decimal_string(goal["daily_base"]),
+                "needed_base": _decimal_string(goal["needed_base"]),
+                "missing_base": _decimal_string(goal["missing_base"]),
+            }
+            for goal in result
+        ]
+        assert normalized == case["expected"], case["name"]

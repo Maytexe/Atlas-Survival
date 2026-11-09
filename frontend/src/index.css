@@ -1,5 +1,11 @@
+@import '@fontsource/atkinson-hyperlegible/latin-400.css';
+@import '@fontsource/atkinson-hyperlegible/latin-700.css';
 @import './styles/foundation.css';
 @import './styles/layout.css';
+@import './styles/ux-components.css';
+@import './styles/dashboard.css';
+@import './styles/inventory.css';
+@import './styles/records.css';
 @import './styles/forms.css';
 @import './styles/feedback.css';
 @import './styles/sheet.css';

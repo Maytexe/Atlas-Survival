@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { AlertCircle, CircleCheck, CloudOff, LoaderCircle } from 'lucide-react'
 import { useSyncStatus } from '@/hooks/useSyncStatus'
 import { messages } from '@/i18n/pt-BR'
 
@@ -10,10 +11,10 @@ const stateLabels = {
 } as const
 
 const stateIcons = {
-  Online: '●',
-  Offline: '○',
-  Sincronizando: '↻',
-  Erro: '!',
+  Online: CircleCheck,
+  Offline: CloudOff,
+  Sincronizando: LoaderCircle,
+  Erro: AlertCircle,
 } as const
 
 function timeAgo(value: string | null, now: number): string {
@@ -48,6 +49,7 @@ export function SyncBadge() {
     state === 'Sincronizando' && pendingCount > 0
       ? `${stateLabels[state]} (${pendingCount})`
       : stateLabels[state]
+  const StateIcon = stateIcons[state]
 
   return (
     <div
@@ -57,7 +59,7 @@ export function SyncBadge() {
       aria-label={messages.syncStatusLabel}
     >
       <span className="sync-icon" aria-hidden="true">
-        {stateIcons[state]}
+        <StateIcon size={20} />
       </span>
       <span className="sync-label">{label}</span>
       <span className="sync-detail">

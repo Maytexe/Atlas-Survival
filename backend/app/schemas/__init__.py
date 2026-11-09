@@ -8,7 +8,7 @@ from app.schemas.common import (
     NonNegativeQuantity,
     ProblemDetails,
 )
-from app.schemas.dashboard import DashboardData
+from app.schemas.dashboard import DashboardData, DashboardResponse, GoalData
 from app.schemas.inventory import InventoryCreate, InventoryRead, InventoryUpdate
 from app.schemas.member import MemberCreate, MemberRead, MemberUpdate
 from app.schemas.sync import AdjustPayload, MutationCreate, PullResponse, PushRequest
@@ -23,9 +23,11 @@ __all__ = [
     "CategoryRead",
     "CategoryUpdate",
     "DashboardData",
+    "DashboardResponse",
     "DecimalInput",
     "DecimalString",
     "InputModel",
+    "GoalData",
     "InventoryCreate",
     "InventoryRead",
     "InventoryUpdate",

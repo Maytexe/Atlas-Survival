@@ -4,6 +4,7 @@ from app.domain.availability import AvailabilityResult, calculate_stock_availabi
 from app.domain.dashboard import DashboardResult, calculate_dashboard
 from app.domain.enums import ConsumptionBasis, ItemKind, MemberType, Unit
 from app.domain.expiry import ExpiryResult, calculate_expiry
+from app.domain.goals import GoalResult, evaluate_goals
 from app.domain.types import BatchSnapshot, ItemSnapshot
 from app.domain.units import UnitBaseResult, calculate_unit_base
 
@@ -16,6 +17,7 @@ __all__ = [
     "ExpiryResult",
     "ItemKind",
     "ItemSnapshot",
+    "GoalResult",
     "MemberType",
     "Unit",
     "UnitBaseResult",
@@ -24,6 +26,7 @@ __all__ = [
     "calculate_autonomy",
     "calculate_dashboard",
     "calculate_expiry",
+    "evaluate_goals",
     "calculate_stock_availability",
     "calculate_unit_base",
 ]

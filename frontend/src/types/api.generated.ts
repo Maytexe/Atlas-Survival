@@ -238,6 +238,17 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AlertData */
+        AlertData: {
+            type: components["schemas"]["AlertType"];
+        } & {
+            [key: string]: unknown;
+        };
+        /**
+         * AlertType
+         * @enum {string}
+         */
+        AlertType: "EXPIRED" | "OUT_OF_STOCK" | "EXPIRING_SOON" | "LOW_STOCK" | "NO_CONSUMPTION_DATA" | "BELOW_GOAL";
         /** BatchCreate */
         BatchCreate: {
             /** Batch Number */
@@ -358,6 +369,51 @@ export interface components {
          * @enum {string}
          */
         ConsumptionBasis: "HOUSEHOLD" | "PER_PERSON" | "PER_ANIMAL";
+        /** DashboardResponse */
+        DashboardResponse: {
+            /** Goals */
+            goals?: components["schemas"]["GoalData"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /** GoalData */
+        GoalData: {
+            /** Available Base */
+            available_base: string;
+            /** Base Unit */
+            base_unit: string;
+            /** Coverage Count */
+            coverage_count: number;
+            /** Daily Base */
+            daily_base: string;
+            /**
+             * Dimension
+             * @enum {string}
+             */
+            dimension: "MASS" | "VOLUME" | "COUNT";
+            /** Goal Days */
+            goal_days: number | null;
+            /**
+             * Item Kind
+             * @enum {string}
+             */
+            item_kind: "FOOD" | "WATER";
+            /** Missing Base */
+            missing_base: string;
+            /** Needed Base */
+            needed_base: string;
+            /** Partial Coverage */
+            partial_coverage: boolean;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "NO_GOAL" | "NO_DATA" | "MET" | "BELOW";
+            /** Total Items */
+            total_items: number;
+        } & {
+            [key: string]: unknown;
+        };
         /** InventoryCreate */
         InventoryCreate: {
             /**
@@ -587,7 +643,10 @@ export type $defs = Record<string, never>;
 export interface operations {
     get_alerts_api_alerts_get: {
         parameters: {
-            query?: never;
+            query?: {
+                goal_food_days?: number | null;
+                goal_water_days?: number | null;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -600,9 +659,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    }[];
+                    "application/json": components["schemas"]["AlertData"][];
                 };
             };
             /** @description Bad Request */
@@ -1127,7 +1184,10 @@ export interface operations {
     };
     get_dashboard_api_dashboard_get: {
         parameters: {
-            query?: never;
+            query?: {
+                goal_food_days?: number | null;
+                goal_water_days?: number | null;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1140,9 +1200,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["DashboardResponse"];
                 };
             };
             /** @description Bad Request */

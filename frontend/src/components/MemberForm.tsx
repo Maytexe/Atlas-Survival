@@ -85,7 +85,10 @@ export function MemberForm({ member, onSaved, onCancel }: MemberFormProps) {
       </label>
       <label>
         {messages.age}
-        <input {...register('age')} inputMode="numeric" type="text" />
+        <span className="input-with-suffix">
+          <input {...register('age')} inputMode="numeric" type="text" />
+          <span>{messages.years}</span>
+        </span>
         {errors.age && (
           <span className="field-error">{errors.age.message}</span>
         )}

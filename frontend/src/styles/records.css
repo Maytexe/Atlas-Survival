@@ -1,0 +1,103 @@
+.detail-measures {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.detail-measure {
+  padding: 0.75rem 0;
+  border-top: 2px solid var(--color-border);
+}
+
+.detail-measure strong {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 1.1rem;
+}
+
+.item-detail-summary {
+  margin-bottom: 1.5rem;
+}
+
+.item-kind-heading,
+.member-name {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.item-kind-heading {
+  color: var(--color-muted);
+}
+
+.item-description {
+  margin-top: 1rem;
+}
+
+.batch-card {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.batch-card p {
+  margin: 0;
+}
+
+.batch-first {
+  border-color: var(--color-good);
+}
+
+.batch-heading,
+.batch-indicators {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.batch-indicators {
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.batch-expiration {
+  color: var(--color-muted);
+}
+
+.goal-settings-section {
+  display: grid;
+  gap: 1rem;
+}
+
+.settings-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--color-muted);
+}
+
+.last-backup {
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.people-note {
+  margin-bottom: 1rem;
+}
+
+.storage-notice {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sheet-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.print-category {
+  margin: 0.75rem 0;
+}

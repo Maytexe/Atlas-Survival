@@ -10,6 +10,7 @@ import {
   updateInventoryItem,
   updateMember,
 } from './repositories'
+import { readSettings, saveLastBackupAt, saveSettings } from './preferences'
 
 const timestampSchema = z.string().datetime()
 const memberSchema = z.object({
@@ -73,6 +74,12 @@ export const backupSchema = z.object({
   categories: z.array(categorySchema),
   inventory_items: z.array(itemSchema),
   stock_batches: z.array(batchSchema),
+  goals: z
+    .object({
+      goal_food_days: z.number().int().min(1).max(365).nullable(),
+      goal_water_days: z.number().int().min(1).max(365).nullable(),
+    })
+    .optional(),
 })
 
 export type AtlasBackup = z.infer<typeof backupSchema>
@@ -82,25 +89,35 @@ export function validateBackup(input: unknown): AtlasBackup {
 }
 
 export async function exportBackup(): Promise<AtlasBackup> {
-  const [household_members, categories, inventory_items, stock_batches] =
-    await Promise.all([
-      db.household_members
-        .filter((record) => record.deleted_at === null)
-        .toArray(),
-      db.categories.filter((record) => record.deleted_at === null).toArray(),
-      db.inventory_items
-        .filter((record) => record.deleted_at === null)
-        .toArray(),
-      db.stock_batches.filter((record) => record.deleted_at === null).toArray(),
-    ])
-  return backupSchema.parse({
+  const [
+    household_members,
+    categories,
+    inventory_items,
+    stock_batches,
+    settings,
+  ] = await Promise.all([
+    db.household_members
+      .filter((record) => record.deleted_at === null)
+      .toArray(),
+    db.categories.filter((record) => record.deleted_at === null).toArray(),
+    db.inventory_items.filter((record) => record.deleted_at === null).toArray(),
+    db.stock_batches.filter((record) => record.deleted_at === null).toArray(),
+    readSettings(),
+  ])
+  const backup = backupSchema.parse({
     version: 1,
     exported_at: new Date().toISOString(),
     household_members,
     categories,
     inventory_items,
     stock_batches,
+    goals: {
+      goal_food_days: settings.goalFoodDays,
+      goal_water_days: settings.goalWaterDays,
+    },
   })
+  await saveLastBackupAt(backup.exported_at)
+  return backup
 }
 
 export async function importBackup(input: unknown): Promise<AtlasBackup> {
@@ -182,6 +199,14 @@ export async function importBackup(input: unknown): Promise<AtlasBackup> {
       })
       existingBatches.add(batch.id)
     }
+  }
+  if (backup.goals) {
+    const settings = await readSettings()
+    await saveSettings({
+      ...settings,
+      goalFoodDays: backup.goals.goal_food_days,
+      goalWaterDays: backup.goals.goal_water_days,
+    })
   }
   return backup
 }

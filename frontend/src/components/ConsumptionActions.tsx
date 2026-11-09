@@ -2,15 +2,18 @@ import { useEffect, useState } from 'react'
 import Decimal from 'decimal.js'
 import type { StockBatch } from '@/db'
 import { messages } from '@/i18n/pt-BR'
+import { formatQuantity } from '@/services/format'
 import { adjustBatchQuantity } from '@/services/repositories'
 
 interface ConsumptionActionsProps {
   batch: StockBatch
+  unit?: string
   onError: (message: string) => void
 }
 
 export function ConsumptionActions({
   batch,
+  unit = messages.countUnit,
   onError,
 }: ConsumptionActionsProps) {
   const [custom, setCustom] = useState('')
@@ -71,7 +74,7 @@ export function ConsumptionActions({
         onClick={() => void consume('1')}
         disabled={!new Decimal(batch.quantity).greaterThanOrEqualTo(1)}
       >
-        {messages.consumeOne}
+        {messages.consumeOne.replace('{quantity}', formatQuantity('1', unit))}
       </button>
       <button
         className="button button-small button-secondary"
@@ -79,7 +82,10 @@ export function ConsumptionActions({
         onClick={() => void consume('0.5')}
         disabled={!new Decimal(batch.quantity).greaterThanOrEqualTo('0.5')}
       >
-        {messages.consumeHalf}
+        {messages.consumeHalf.replace(
+          '{quantity}',
+          formatQuantity('0.5', unit),
+        )}
       </button>
       <form
         className="consume-custom"
@@ -90,14 +96,17 @@ export function ConsumptionActions({
       >
         <label>
           <span className="sr-only">{messages.customAmount}</span>
-          <input
-            type="text"
-            inputMode="decimal"
-            value={custom}
-            onChange={(event) => setCustom(event.target.value)}
-            placeholder={messages.customAmount}
-            aria-label={messages.customAmount}
-          />
+          <span className="input-with-suffix">
+            <input
+              type="text"
+              inputMode="decimal"
+              value={custom}
+              onChange={(event) => setCustom(event.target.value)}
+              placeholder={messages.customAmount}
+              aria-label={messages.customAmount}
+            />
+            <span>{unit}</span>
+          </span>
         </label>
         <button className="button button-small" type="submit">
           {messages.consume}

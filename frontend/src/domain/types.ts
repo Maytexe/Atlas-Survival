@@ -48,6 +48,7 @@ export interface AlertResult {
     | 'EXPIRING_SOON'
     | 'LOW_STOCK'
     | 'NO_CONSUMPTION_DATA'
+    | 'BELOW_GOAL'
   severity: 'CRITICAL' | 'WARNING' | 'INFO'
   item_id: string
   batch_id: string | null
@@ -58,6 +59,8 @@ export interface AutonomyAggregate {
   item_kind: 'FOOD' | 'WATER'
   dimension: 'MASS' | 'VOLUME' | 'COUNT'
   days: number
+  available_base: Decimal
+  daily_base: Decimal
   coverage_count: number
   total_items: number
   coverage_label: string
@@ -65,9 +68,26 @@ export interface AutonomyAggregate {
   base_unit?: string
 }
 
+export interface GoalResult {
+  item_kind: 'FOOD' | 'WATER'
+  dimension: 'MASS' | 'VOLUME' | 'COUNT'
+  base_unit: string
+  goal_days: number | null
+  status: 'NO_GOAL' | 'NO_DATA' | 'MET' | 'BELOW'
+  available_base: Decimal
+  daily_base: Decimal
+  needed_base: Decimal
+  missing_base: Decimal
+  partial_coverage: boolean
+  coverage_count: number
+  total_items: number
+  limiting_item: string | null
+}
+
 export interface DashboardResult {
   availability: Record<string, { available: Decimal }>
   expired_batches: number
   expiring_soon_batches: number
   autonomy: AutonomyAggregate[]
+  goals: GoalResult[]
 }

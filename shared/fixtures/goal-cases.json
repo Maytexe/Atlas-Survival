@@ -1,0 +1,282 @@
+[
+  {
+    "name": "metas por grupos, cobertura parcial e arredondamento para cima",
+    "today": "2026-01-15",
+    "goal_food_days": 3,
+    "goal_water_days": 3,
+    "items": [
+      {
+        "id": "comida-massa",
+        "name": "Arroz",
+        "item_kind": "FOOD",
+        "unit": "kg",
+        "daily_consumption": "1.000",
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": [
+          {"id": "arroz", "quantity": "3.000", "expiration_date": null}
+        ]
+      },
+      {
+        "id": "comida-volume",
+        "name": "Suco",
+        "item_kind": "FOOD",
+        "unit": "ml",
+        "daily_consumption": "1000.000",
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": [
+          {"id": "suco", "quantity": "2999.000", "expiration_date": null}
+        ]
+      },
+      {
+        "id": "comida-volume-sem-consumo",
+        "name": "Caldo",
+        "item_kind": "FOOD",
+        "unit": "ml",
+        "daily_consumption": null,
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": [
+          {"id": "caldo", "quantity": "50000.000", "expiration_date": null}
+        ]
+      },
+      {
+        "id": "comida-contagem",
+        "name": "Ração unitária",
+        "item_kind": "FOOD",
+        "unit": "unidade",
+        "daily_consumption": "2.000",
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": []
+      },
+      {
+        "id": "agua-volume",
+        "name": "Água",
+        "item_kind": "WATER",
+        "unit": "L",
+        "daily_consumption": "1.000",
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": [
+          {"id": "agua-vencida", "quantity": "5.000", "expiration_date": "2026-01-14"}
+        ]
+      },
+      {
+        "id": "agua-contagem-sem-consumo",
+        "name": "Garrafa de água",
+        "item_kind": "WATER",
+        "unit": "garrafa",
+        "daily_consumption": null,
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": []
+      },
+      {
+        "id": "agua-massa-sem-meta",
+        "name": "Item de água sem consumo",
+        "item_kind": "WATER",
+        "unit": "kg",
+        "daily_consumption": null,
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": []
+      },
+      {
+        "id": "agua-massa-fracionaria",
+        "name": "Consumo fracionário",
+        "item_kind": "WATER",
+        "unit": "g",
+        "daily_consumption": "0.001",
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": []
+      }
+    ],
+    "expected": [
+      {
+        "item_kind": "FOOD",
+        "dimension": "MASS",
+        "base_unit": "g",
+        "goal_days": 3,
+        "status": "MET",
+        "available_base": "3000",
+        "daily_base": "1000",
+        "needed_base": "3000",
+        "missing_base": "0",
+        "partial_coverage": false,
+        "coverage_count": 1,
+        "total_items": 1,
+        "limiting_item": "comida-massa"
+      },
+      {
+        "item_kind": "FOOD",
+        "dimension": "VOLUME",
+        "base_unit": "ml",
+        "goal_days": 3,
+        "status": "BELOW",
+        "available_base": "2999",
+        "daily_base": "1000",
+        "needed_base": "3000",
+        "missing_base": "1",
+        "partial_coverage": true,
+        "coverage_count": 1,
+        "total_items": 2,
+        "limiting_item": "comida-volume"
+      },
+      {
+        "item_kind": "FOOD",
+        "dimension": "COUNT",
+        "base_unit": "unidade",
+        "goal_days": 3,
+        "status": "BELOW",
+        "available_base": "0",
+        "daily_base": "2",
+        "needed_base": "6",
+        "missing_base": "6",
+        "partial_coverage": false,
+        "coverage_count": 1,
+        "total_items": 1,
+        "limiting_item": "comida-contagem"
+      },
+      {
+        "item_kind": "WATER",
+        "dimension": "MASS",
+        "base_unit": "g",
+        "goal_days": 3,
+        "status": "BELOW",
+        "available_base": "0",
+        "daily_base": "0.001",
+        "needed_base": "0.003",
+        "missing_base": "1",
+        "partial_coverage": true,
+        "coverage_count": 1,
+        "total_items": 2,
+        "limiting_item": "agua-massa-fracionaria"
+      },
+      {
+        "item_kind": "WATER",
+        "dimension": "VOLUME",
+        "base_unit": "ml",
+        "goal_days": 3,
+        "status": "BELOW",
+        "available_base": "0",
+        "daily_base": "1000",
+        "needed_base": "3000",
+        "missing_base": "3000",
+        "partial_coverage": false,
+        "coverage_count": 1,
+        "total_items": 1,
+        "limiting_item": "agua-volume"
+      },
+      {
+        "item_kind": "WATER",
+        "dimension": "COUNT",
+        "base_unit": "garrafa",
+        "goal_days": 3,
+        "status": "NO_DATA",
+        "available_base": "0",
+        "daily_base": "0",
+        "needed_base": "0",
+        "missing_base": "0",
+        "partial_coverage": true,
+        "coverage_count": 0,
+        "total_items": 1,
+        "limiting_item": null
+      }
+    ]
+  },
+  {
+    "name": "sem metas não produz avaliação",
+    "today": "2026-01-15",
+    "goal_food_days": null,
+    "goal_water_days": null,
+    "items": [
+      {
+        "id": "comida",
+        "name": "Comida",
+        "item_kind": "FOOD",
+        "unit": "kg",
+        "daily_consumption": "1.000",
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": [
+          {"id": "comida", "quantity": "1.000", "expiration_date": null}
+        ]
+      }
+    ],
+    "expected": []
+  },
+  {
+    "name": "grupo sem meta permanece NO_GOAL",
+    "today": "2026-01-15",
+    "goal_food_days": 1,
+    "goal_water_days": null,
+    "items": [
+      {
+        "id": "comida",
+        "name": "Comida",
+        "item_kind": "FOOD",
+        "unit": "kg",
+        "daily_consumption": "1.000",
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": [{"id": "comida", "quantity": "1.000", "expiration_date": null}]
+      },
+      {
+        "id": "agua",
+        "name": "Água sem meta",
+        "item_kind": "WATER",
+        "unit": "L",
+        "daily_consumption": "1.000",
+        "consumption_basis": "HOUSEHOLD",
+        "person_count": 0,
+        "animal_count": 0,
+        "batches": [{"id": "agua", "quantity": "1.000", "expiration_date": null}]
+      }
+    ],
+    "expected": [
+      {
+        "item_kind": "FOOD",
+        "dimension": "MASS",
+        "base_unit": "g",
+        "goal_days": 1,
+        "status": "MET",
+        "available_base": "1000",
+        "daily_base": "1000",
+        "needed_base": "1000",
+        "missing_base": "0",
+        "partial_coverage": false,
+        "coverage_count": 1,
+        "total_items": 1,
+        "limiting_item": "comida"
+      },
+      {
+        "item_kind": "WATER",
+        "dimension": "VOLUME",
+        "base_unit": "ml",
+        "goal_days": null,
+        "status": "NO_GOAL",
+        "available_base": "1000",
+        "daily_base": "1000",
+        "needed_base": "0",
+        "missing_base": "0",
+        "partial_coverage": false,
+        "coverage_count": 1,
+        "total_items": 1,
+        "limiting_item": "agua"
+      }
+    ]
+  }
+]

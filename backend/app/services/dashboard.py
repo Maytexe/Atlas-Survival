@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain import BatchSnapshot, ItemSnapshot, calculate_dashboard
 from app.models import HouseholdMember, InventoryItem, StockBatch
-from app.schemas import DashboardData
+from app.schemas import DashboardData, GoalData
 
 
 async def load_domain_items(session: AsyncSession) -> tuple[ItemSnapshot, ...]:
@@ -57,13 +57,23 @@ async def load_domain_items(session: AsyncSession) -> tuple[ItemSnapshot, ...]:
     )
 
 
-async def build_dashboard(session: AsyncSession, today: date) -> DashboardData:
+async def build_dashboard(
+    session: AsyncSession,
+    today: date,
+    goal_food_days: int | None = None,
+    goal_water_days: int | None = None,
+) -> DashboardData:
     items = await load_domain_items(session)
     members = list(
         await session.scalars(select(HouseholdMember).where(HouseholdMember.deleted_at.is_(None)))
     )
-    calculation = calculate_dashboard(items=items, today=today)
-    return {
+    calculation = calculate_dashboard(
+        items=items,
+        today=today,
+        goal_food_days=goal_food_days,
+        goal_water_days=goal_water_days,
+    )
+    result: DashboardData = {
         "total_items": len(items),
         "total_members": len(members),
         "people": sum(member.member_type.value == "PERSON" for member in members),
@@ -74,6 +84,32 @@ async def build_dashboard(session: AsyncSession, today: date) -> DashboardData:
         },
         "expired_batches": calculation["expired_batches"],
         "expiring_soon_batches": calculation["expiring_soon_batches"],
-        "autonomy": calculation["autonomy"],
+        "autonomy": [
+            {
+                **aggregate,
+                "available_base": format(aggregate["available_base"], "f"),
+                "daily_base": format(aggregate["daily_base"], "f"),
+            }
+            for aggregate in calculation["autonomy"]
+        ],
         "today": today.isoformat(),
     }
+    if goal_food_days is not None or goal_water_days is not None:
+        result["goals"] = [
+            GoalData(
+                item_kind=goal["item_kind"],
+                dimension=goal["dimension"],
+                base_unit=goal["base_unit"],
+                goal_days=goal["goal_days"],
+                status=goal["status"],
+                available_base=format(goal["available_base"], "f"),
+                daily_base=format(goal["daily_base"], "f"),
+                needed_base=format(goal["needed_base"], "f"),
+                missing_base=format(goal["missing_base"], "f"),
+                partial_coverage=goal["partial_coverage"],
+                coverage_count=goal["coverage_count"],
+                total_items=goal["total_items"],
+            )
+            for goal in calculation["goals"]
+        ]
+    return result

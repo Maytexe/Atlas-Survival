@@ -2,6 +2,7 @@ import { calculateAutonomy } from './autonomy'
 import { calculateStockAvailability } from './availability'
 import { effectiveDaily } from './consumption'
 import { calculateExpiry } from './expiry'
+import { calculateGoals } from './goals'
 import type { AlertResult, ItemSnapshot } from './types'
 
 const severityOrder = { CRITICAL: 0, WARNING: 1, INFO: 2 }
@@ -10,6 +11,8 @@ export function calculateAlerts(
   items: readonly ItemSnapshot[],
   today: string,
   lowStockDays: number,
+  goalFoodDays: number | null = null,
+  goalWaterDays: number | null = null,
 ): AlertResult[] {
   const alerts: AlertResult[] = []
   for (const item of items) {
@@ -63,6 +66,22 @@ export function calculateAlerts(
           date: null,
         })
       }
+    }
+  }
+  for (const goal of calculateGoals(
+    items,
+    today,
+    goalFoodDays,
+    goalWaterDays,
+  )) {
+    if (goal.status === 'BELOW' && goal.limiting_item !== null) {
+      alerts.push({
+        type: 'BELOW_GOAL',
+        severity: 'WARNING',
+        item_id: goal.limiting_item,
+        batch_id: null,
+        date: null,
+      })
     }
   }
   return alerts.sort(

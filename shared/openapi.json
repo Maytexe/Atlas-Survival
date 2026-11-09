@@ -1,6 +1,31 @@
 {
   "components": {
     "schemas": {
+      "AlertData": {
+        "additionalProperties": true,
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/AlertType"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "title": "AlertData",
+        "type": "object"
+      },
+      "AlertType": {
+        "enum": [
+          "EXPIRED",
+          "OUT_OF_STOCK",
+          "EXPIRING_SOON",
+          "LOW_STOCK",
+          "NO_CONSUMPTION_DATA",
+          "BELOW_GOAL"
+        ],
+        "title": "AlertType",
+        "type": "string"
+      },
       "BatchCreate": {
         "additionalProperties": false,
         "properties": {
@@ -404,6 +429,111 @@
         ],
         "title": "ConsumptionBasis",
         "type": "string"
+      },
+      "DashboardResponse": {
+        "additionalProperties": true,
+        "properties": {
+          "goals": {
+            "items": {
+              "$ref": "#/components/schemas/GoalData"
+            },
+            "title": "Goals",
+            "type": "array"
+          }
+        },
+        "title": "DashboardResponse",
+        "type": "object"
+      },
+      "GoalData": {
+        "additionalProperties": true,
+        "properties": {
+          "available_base": {
+            "title": "Available Base",
+            "type": "string"
+          },
+          "base_unit": {
+            "title": "Base Unit",
+            "type": "string"
+          },
+          "coverage_count": {
+            "title": "Coverage Count",
+            "type": "integer"
+          },
+          "daily_base": {
+            "title": "Daily Base",
+            "type": "string"
+          },
+          "dimension": {
+            "enum": [
+              "MASS",
+              "VOLUME",
+              "COUNT"
+            ],
+            "title": "Dimension",
+            "type": "string"
+          },
+          "goal_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Goal Days"
+          },
+          "item_kind": {
+            "enum": [
+              "FOOD",
+              "WATER"
+            ],
+            "title": "Item Kind",
+            "type": "string"
+          },
+          "missing_base": {
+            "title": "Missing Base",
+            "type": "string"
+          },
+          "needed_base": {
+            "title": "Needed Base",
+            "type": "string"
+          },
+          "partial_coverage": {
+            "title": "Partial Coverage",
+            "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "NO_GOAL",
+              "NO_DATA",
+              "MET",
+              "BELOW"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "total_items": {
+            "title": "Total Items",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "item_kind",
+          "dimension",
+          "base_unit",
+          "goal_days",
+          "status",
+          "available_base",
+          "daily_base",
+          "needed_base",
+          "missing_base",
+          "partial_coverage",
+          "coverage_count",
+          "total_items"
+        ],
+        "title": "GoalData",
+        "type": "object"
       },
       "InventoryCreate": {
         "additionalProperties": false,
@@ -1093,14 +1223,51 @@
     "/api/alerts": {
       "get": {
         "operationId": "get_alerts_api_alerts_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "goal_food_days",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 365,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Goal Food Days"
+            }
+          },
+          {
+            "in": "query",
+            "name": "goal_water_days",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 365,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Goal Water Days"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
                 "schema": {
                   "items": {
-                    "additionalProperties": true,
-                    "type": "object"
+                    "$ref": "#/components/schemas/AlertData"
                   },
                   "title": "Response Get Alerts Api Alerts Get",
                   "type": "array"
@@ -1714,14 +1881,50 @@
     "/api/dashboard": {
       "get": {
         "operationId": "get_dashboard_api_dashboard_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "goal_food_days",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 365,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Goal Food Days"
+            }
+          },
+          {
+            "in": "query",
+            "name": "goal_water_days",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 365,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Goal Water Days"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Get Dashboard Api Dashboard Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/DashboardResponse"
                 }
               }
             },

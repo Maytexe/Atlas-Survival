@@ -1,6 +1,6 @@
 import type Decimal from 'decimal.js'
 import { messages } from '@/i18n/pt-BR'
-import { formatDecimal } from '@/services/format'
+import { formatQuantity } from '@/services/format'
 
 interface AvailabilityListProps {
   availability: Record<string, { available: Decimal }>
@@ -15,13 +15,17 @@ export function AvailabilityList({ availability }: AvailabilityListProps) {
     <ul className="availability-list">
       {entries.map(([key, value]) => {
         const [kind, dimension, unit] = key.split(':')
-        const label = `${kind === 'FOOD' ? messages.foodAvailability : messages.waterAvailability} · ${messages.availabilityDimension
-          .replace('{dimension}', dimension ?? '')
-          .replace('{unit}', unit ?? (dimension === 'MASS' ? 'g' : 'ml'))}`
+        const baseUnit =
+          unit ??
+          (dimension === 'MASS' ? 'g' : dimension === 'VOLUME' ? 'ml' : '')
+        const label =
+          kind === 'FOOD'
+            ? messages.foodAvailability
+            : messages.waterAvailability
         return (
           <li key={key}>
             <span>{label}</span>
-            <strong>{formatDecimal(value.available)}</strong>
+            <strong>{formatQuantity(value.available, baseUnit)}</strong>
           </li>
         )
       })}
